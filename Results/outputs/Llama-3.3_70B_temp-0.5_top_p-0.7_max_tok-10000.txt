@@ -1,0 +1,65 @@
+**VERSION_1.2.md**
+# Brush Language - Version 1.2.0 Release Notes
+Released: January 15, 2025
+
+## Overview
+Version 1.2 of the Brush language brings significant improvements to the type inference system, performance, and overall developer experience. This release includes several major features, bug fixes, and performance optimizations. We're excited to introduce the new async/await syntax, which simplifies concurrent programming and makes it easier to write efficient code.
+
+The Brush language is designed to be fast, efficient, and easy to use. With this release, developers can now take advantage of improved type inference, reduced compile time, and a smaller runtime footprint. The new version is compatible with 1.1.x modules and requires LLVM 15.0+ for compilation.
+
+## Highlights
+* **Improved Type Inference System**: The compiler now performs bidirectional type checking during the constraint resolution phase, allowing it to infer complex generic types from context. This improvement is particularly noticeable in functional programming patterns involving higher-order functions and closures.
+* **Async/Await Syntax**: The new async/await syntax simplifies concurrent programming and makes it easier to write efficient code. The `brush.async.timeout()` function allows developers to set timeouts for asynchronous operations, and the `brush.async.parallel()` function enables parallel execution of tasks.
+* **Performance Improvements**: This release includes several performance optimizations, resulting in a 15% reduction in compile time and a 40% smaller binary size. The runtime footprint has been reduced from 8MB to 5.2MB, making it more suitable for resource-constrained environments.
+* **Error Handling**: The error handling system has been improved, with more informative error messages and better support for error propagation. The `try`-`catch` block now supports asynchronous operations, making it easier to handle errors in concurrent code.
+
+## Breaking Changes
+⚠️ **String Encoding Change**: The default string encoding has changed from UTF-8 to UTF-16 for Windows compatibility. Existing code that relies on byte-level string operations may need adjustment. See migration guide in docs/migration/1.1-to-1.2.md.
+
+## Bug Fixes
+For a complete list of fixes, see CHANGELOG_1.2.md. This release addresses several issues, including fixes for the compiler crash when using nested lambda expressions with closure capture (#1847) and the SEGFAULT in the garbage collector during concurrent object allocation.
+
+## Performance Improvements
+This release includes several performance optimizations, resulting in a 15% reduction in compile time and a 40% smaller binary size. The runtime footprint has been reduced from 8MB to 5.2MB, making it more suitable for resource-constrained environments.
+
+## Deprecation Notices
+The following features are deprecated and will be removed in future versions:
+* The `brush.io` module will be replaced by the `brush.std.io` module.
+* The `brush.net` module will be removed in favor of the `brush.std.net` module.
+
+## Installation & Upgrade
+To upgrade to version 1.2, simply download the latest installer from the Brush website and follow the installation instructions. Developers upgrading from 1.1.x should note that the default string encoding has changed and may need to adjust their code accordingly.
+
+## Dependencies
+This release requires LLVM 15.0+ for compilation and is compatible with GCC 11+. The following libraries have been updated:
+* `brush-stdlib` version 1.2.0
+* `brush-runtime` version 1.2.0
+
+**CHANGELOG_1.2.md**
+## [1.2.0] - 2025-01-15
+
+### Added
+* Fix async/await syntax support, now allows for concurrent programming with `brush.async.timeout()` and `brush.async.parallel()`. Reported by John Smith <jsmith@email.com>
+* Update documentation for `brush.std.io` module, includes examples for reading and writing files. Fixed by Sarah Chen <s.chen@brushlang.org>
+
+### Changed
+* Update `parseExpression()` function to support new syntax for async/await. Now uses `Token.IDENTIFIER` to parse async keywords.
+* Change default string encoding to UTF-16 for Windows compatibility. Fixes #203, reported by Mike Torres
+
+### Fixed
+* Fixed compiler crash when using nested lambda expressions with closure capture. The issue occurred in `eval_context()` when scope resolution failed for shadowed variables (fixes #1847).
+* Resolved SEGFAULT in garbage collector during concurrent object allocation. Reported by Emma Rodriguez <e.rodriguez@techcorp.io>
+* Patched memory leak in `gc_collect()` function, now properly frees memory allocated for objects. Fixes #2301
+
+### Security
+* Patched security vulnerability in `brush.std.net` module, now properly validates user input to prevent buffer overflows. Reported by David Lee <dlee@security.com>
+
+### Performance
+* Performance improvement in string interpolation - now 23% faster for strings with 10+ variables (#2301)
+* Optimized `brush.runtime.eval()` function, now uses caching to improve performance. Results in 15% reduction in compile time.
+
+### Documentation
+* Update documentation for `brush.std.io` module, includes examples for reading and writing files. Fixed by Sarah Chen <s.chen@brushlang.org>
+* Add documentation for new async/await syntax, includes examples for concurrent programming. Reported by John Smith <jsmith@email.com>
+
+Note: For a complete list of changes, see the Brush issue tracker, issues #1840-#1891.

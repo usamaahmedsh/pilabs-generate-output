@@ -1,0 +1,103 @@
+# Brush Programming Language - Version 1.2 Release Notes
+
+## Version 1.2 File
+
+### Overview
+Brush is a high-level, versatile programming language designed for simplicity and efficiency. With an emphasis on clean syntax and robust functionality, Brush aims to provide developers with the tools they need to create powerful applications swiftly. Version 1.2 introduces several new features, optimizations, and critical bug fixes to enhance the development experience.
+
+### New Features
+1. **Pattern Matching**
+   - Introduced native pattern matching to simplify complex control flow. This feature allows developers to write more readable and concise code by matching values against patterns.
+   - Syntax:
+     ```brush
+     match value {
+         pattern1 => action1,
+         pattern2 => action2,
+         _ => defaultAction
+     }
+     ```
+
+2. **Asynchronous Programming Enhancements**
+   - Added support for `async` and `await` keywords, enabling non-blocking execution of tasks.
+   - Improved concurrency model with native support for coroutines.
+   - Example:
+     ```brush
+     async function fetchData(url) {
+         await networkRequest(url);
+     }
+     ```
+
+3. **Lambda Expressions**
+   - Introduced concise lambda expression syntax for inline anonymous functions.
+   - Example:
+     ```brush
+     let square = (x) => x * x;
+     ```
+
+4. **Enhanced Module System**
+   - Improved module resolution and dependency management, making it easier to organize and share code.
+   - Support for nested modules and aliasing.
+   - Example:
+     ```brush
+     import { ModuleA as MA } from 'module_a';
+     ```
+
+5. **Improved Error Handling**
+   - Added `try-catch-finally` blocks to manage exceptions more effectively.
+   - Enhanced error messages with more context for easier debugging.
+
+### Bug Fixes
+1. **Memory Leak Fixes**
+   - Resolved issues causing memory leaks in long-running applications, particularly in the garbage collector.
+   
+2. **Compiler Optimization Bugs**
+   - Fixed incorrect optimizations that caused miscompilation of certain recursive functions.
+   
+3. **Standard Library Corrections**
+   - Addressed edge cases in the string manipulation library that caused crashes with non-UTF8 encoded strings.
+   - Fixed arithmetic precision errors in the math library, ensuring accurate calculations.
+
+4. **Syntax Highlighting Errors**
+   - Corrected syntax highlighting issues in the official IDE, ensuring accurate representation of code structure.
+
+5. **Cross-Platform Compatibility**
+   - Resolved file path handling inconsistencies across different operating systems, ensuring seamless cross-platform development.
+
+### Technical Improvements
+1. **Performance Enhancements**
+   - Optimized the virtual machine for faster execution, reducing average runtime by up to 30%.
+   - Improved memory allocation strategies to decrease latency.
+
+2. **Security Patches**
+   - Addressed several vulnerabilities in the networking library to prevent potential exploitations.
+   - Enhanced security for module imports to prevent unauthorized code execution.
+
+3. **Documentation Updates**
+   - Expanded and improved official documentation with more examples and detailed API descriptions.
+
+4. **Testing Framework Integration**
+   - Integrated a new testing framework for more comprehensive and automated testing processes.
+
+---
+
+## Changelog for Version 1.2
+
+- **New Features**
+  - Added pattern matching syntax for easier control flow.
+  - Introduced async/await for asynchronous programming.
+  - Implemented lambda expressions for concise function definitions.
+  - Enhanced module system with better resolution and aliasing.
+  - Improved error handling with try-catch-finally blocks.
+
+- **Bug Fixes**
+  - Fixed memory leaks in garbage collector.
+  - Resolved compiler optimization errors with recursive functions.
+  - Corrected string manipulation and arithmetic precision issues in standard library.
+  - Fixed syntax highlighting in IDE.
+  - Improved cross-platform file path handling.
+
+- **Technical Improvements**
+  - Enhanced virtual machine performance.
+  - Applied security patches to networking library.
+  - Updated documentation.
+  - Integrated new testing framework.

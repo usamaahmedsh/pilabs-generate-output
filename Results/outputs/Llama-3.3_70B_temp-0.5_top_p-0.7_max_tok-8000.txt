@@ -1,0 +1,64 @@
+### VERSION_1.2.md
+# Brush Language - Version 1.2.0 Release Notes
+Released: January 15, 2025
+
+## Overview
+Version 1.2 of the Brush language is a significant update that brings numerous improvements, fixes, and new features to enhance the development experience. This release includes major updates to the type inference system, improvements in string interpolation, and several bug fixes that increase the stability and performance of the language. We're excited to introduce these changes, which have been shaped by community feedback and our ongoing commitment to making Brush a powerful and enjoyable language to use.
+
+The Brush language continues to evolve with a focus on usability, performance, and compatibility. Version 1.2 is compatible with 1.1.x modules, ensuring a smooth transition for existing projects. This release also lays the groundwork for future enhancements, with updates to core libraries and the introduction of new APIs.
+
+## Highlights
+- **Enhanced Type Inference**: Version 1.2 introduces an improved type inference system for generic functions. This enhancement significantly reduces the need for explicit type annotations by performing bidirectional type checking during the constraint resolution phase. For example, when using generic functions with complex types, the compiler can now infer these types from context, making the code more concise and easier to maintain.
+- **String Interpolation Performance**: This release includes a performance improvement in string interpolation, now making it 23% faster for strings with 10+ variables. This is achieved through optimizations in the `parseExpression()` function, which better handles variable substitutions.
+- **Async/Await Syntax**: The documentation for async/await syntax has been updated to reflect the latest best practices, moving away from deprecated callback styles. Developers can now write asynchronous code that is more readable and maintainable, using the `brush.async.timeout()` function for handling timeouts and callbacks.
+
+## Breaking Changes
+⚠️ **String Encoding Change**: The default string encoding has changed from UTF-8 to UTF-16 for Windows compatibility. Existing code that relies on byte-level string operations may need adjustment. For example, code that manually manipulates string bytes will need to account for the new encoding. See the migration guide in `docs/migration/1.1-to-1.2.md` for detailed instructions on how to update your code.
+
+## Bug Fixes
+For a complete list of fixes, see `CHANGELOG_1.2.md`. This release addresses several critical issues, including fixes for compiler crashes, memory leaks, and improvements in error handling.
+
+## Performance Improvements
+Version 1.2 brings a 15% reduction in compile time and a 40% smaller binary size compared to the previous version. These improvements are due to optimizations in the compiler pipeline and better resource management, such as the `gc_collect()` function call being more efficient.
+
+## Deprecation Notices
+The `Token.IDENTIFIER` type will be deprecated in the next major release in favor of a more flexible and expressive token system. Developers are advised to update their code to use the new token types to ensure future compatibility.
+
+## Installation & Upgrade
+To upgrade from 1.1.x, follow the migration guide. Note that Brush 1.2 requires LLVM 15.0+ for compilation. The runtime footprint has been reduced from 8MB to 5.2MB, making it more suitable for resource-constrained environments.
+
+## Dependencies
+This release updates several dependencies, including an upgrade to GCC 11+, ensuring better compatibility and performance on various platforms.
+
+### CHANGELOG_1.2.md
+## [1.2.0] - 2025-01-15
+
+### Added
+- Implemented support for nested lambda expressions with closure capture. This feature allows for more expressive and concise code, especially in functional programming contexts.
+- Added new API for async/await syntax, deprecating the old callback style. The `brush.async.timeout()` function now provides a more streamlined way to handle asynchronous operations.
+
+### Changed
+- Update documentation for async/await to reflect best practices. The examples now demonstrate how to use async/await effectively, including error handling and timeouts.
+- Changed default string encoding to UTF-16 for Windows compatibility. This change may require adjustments in code that performs byte-level string operations.
+
+### Fixed
+- Fixed compiler crash when using nested lambda expressions with closure capture. The issue occurred in `eval_context()` when scope resolution failed for shadowed variables (fixes #1847).
+- Fix memory leak in `gc_collect()` function. The leak was causing performance issues over time, especially in applications with high object allocation rates.
+- Resolved SEGFAULT in garbage collector during concurrent object allocation. Reported by Emma Rodriguez <e.rodriguez@techcorp.io>.
+- Patched error in `parseExpression()` that caused incorrect parsing of complex expressions. This fix improves the overall stability of the compiler.
+
+### Security
+- Patched vulnerability in string interpolation that could lead to code injection. The fix involves stricter validation of user-inputted variables (fixes #203).
+
+### Performance
+- Performance improvement in string interpolation - now 23% faster for strings with 10+ variables (#2301).
+- Optimized `gc_collect()` for better performance under load. The optimization reduces pause times and improves overall system responsiveness.
+
+### Documentation
+- Update documentation for type inference to include examples of generic functions. The documentation now covers how to use type inference effectively, including best practices for complex generic types.
+- Fixed typo in async/await documentation. The correction improves readability and clarity of the documentation.
+
+### Deprecated
+- The `Token.IDENTIFIER` type is deprecated in favor of new token types. Developers should update their code to use the new types to ensure future compatibility.
+
+Thanks to the Brush community for their contributions and feedback. For more details on these changes and future plans, visit our issue tracker and documentation site.

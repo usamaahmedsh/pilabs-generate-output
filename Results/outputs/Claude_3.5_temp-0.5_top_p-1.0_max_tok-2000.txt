@@ -1,0 +1,146 @@
+# VERSION_1.2.md
+
+# Brush Language - Version 1.2.0 Release Notes
+
+Released: March 22, 2025
+
+## Overview
+
+Brush 1.2.0 represents a significant milestone in the language's development, focusing on performance optimizations, developer ergonomics, and ecosystem stability. This release introduces several new language features while substantially improving the compiler's type system and runtime performance.
+
+We're excited to introduce the new async/await syntax, which simplifies asynchronous programming patterns that previously required complex callback chains. Additionally, version 1.2 brings important memory management improvements that reduce application footprint and improve garbage collection efficiency.
+
+## Highlights
+
+### Async/Await Pattern Support
+
+Brush now offers first-class support for asynchronous programming through the new `async` and `await` keywords. Functions marked with `async` automatically return a `Promise<T>` type that can be awaited. The runtime scheduler efficiently manages these promises without blocking the main thread. This feature eliminates callback hell while maintaining Brush's performance characteristics.
+
+```brush
+async fn fetchData(url: string) -> Data {
+    let response = await http.get(url);
+    return response.parseJson<Data>();
+}
+```
+
+### Enhanced Type Inference System
+
+Version 1.2 introduces enhanced type inference for generic functions, significantly reducing the need for explicit type annotations. The compiler now performs bidirectional type checking during the constraint resolution phase, allowing it to infer complex generic types from context. This improvement is particularly noticeable in functional programming patterns involving higher-order functions and closures.
+
+```brush
+// Before 1.2:
+let result = map<int, string>(numbers, (n: int): string => n.toString());
+
+// Now in 1.2:
+let result = map(numbers, n => n.toString());  // Types inferred automatically
+```
+
+### Pattern Matching Expressions
+
+Brush 1.2 adds comprehensive pattern matching with the new `match` expression. This feature supports destructuring, type matching, guards, and exhaustiveness checking. The compiler optimizes match expressions into efficient jump tables when possible, making them both expressive and performant.
+
+### String Interpolation Overhaul
+
+String interpolation has been completely rewritten to be more efficient and expressive. The new implementation reduces memory allocations by 65% and improves formatting options. Developers can now specify precision, padding, and alignment directly in the interpolation syntax.
+
+### Module System Improvements
+
+The module system has been enhanced with better circular dependency handling and lazy loading capabilities. Modules can now be dynamically imported using the new `import()` function that returns a Promise, allowing for code-splitting and on-demand loading.
+
+## Breaking Changes
+
+⚠️ **String Encoding Change**: The default string encoding has changed from UTF-8 to UTF-16 for Windows compatibility. Existing code that relies on byte-level string operations may need adjustment. See migration guide in docs/migration/1.1-to-1.2.md.
+
+⚠️ **Garbage Collection Behavior**: The garbage collector now runs more aggressively in low-memory situations. Applications that were relying on deterministic cleanup timing may experience different behavior. Use the new `gc_control()` API to fine-tune collection behavior if needed.
+
+## Performance Improvements
+
+The Brush compiler and runtime have received significant performance optimizations:
+
+- Compiler throughput improved by 28% for large projects
+- Runtime memory footprint reduced from 8.4MB to 5.2MB
+- String operations are now 23% faster on average
+- Type checking phase is 35% faster through improved caching
+- Binary size reduced by 12% through better dead code elimination
+
+These improvements are most noticeable in large applications with 50,000+ lines of code, where compilation times have decreased from minutes to seconds.
+
+## Deprecation Notices
+
+The following features are deprecated in 1.2 and will be removed in version 1.3:
+
+- The `callback` parameter style for asynchronous functions (use async/await instead)
+- The `oldImport()` function (use standard `import` statements)
+- The `MutableString` class (use standard `String` with the new `.toMutable()` method)
+- Legacy error handling via `try/catch/finally` (use the Result type pattern)
+
+## Installation & Upgrade
+
+Brush 1.2 is compatible with 1.1.x modules but requires recompilation. To upgrade:
+
+```
+brush upgrade --version 1.2.0
+```
+
+Developers upgrading from 1.1.x should note that the compiler now enforces stricter null safety checks. Code that compiled with warnings in 1.1 may generate errors in 1.2. The `--legacy-null-checks` flag can be used temporarily during migration.
+
+## Dependencies
+
+- Requires LLVM 16.0+ (up from 15.0)
+- Compatible with GCC 12+ and Clang 14+
+- Runtime now uses libuv 1.44.2
+- Windows builds require Visual Studio 2022 or newer
+
+For a complete list of fixes and improvements, see CHANGELOG_1.2.md.
+
+# CHANGELOG_1.2.md
+
+## [1.2.0] - 2025-03-22
+
+### Added
+
+- Introduced async/await syntax for simplified asynchronous programming. This replaces the callback-based approach with a more intuitive syntax that maintains performance. (#1842)
+
+- Added pattern matching with the new `match` expression supporting destructuring, type patterns, and guards. The compiler optimizes match statements into jump tables when possible for O(1) lookup. (BRH-290)
+
+- New `gc_control()` API for fine-tuning garbage collector behavior with options for collection frequency and memory thresholds. Thanks to Rajiv Patel <rpatel@brushlang.org> for implementation.
+
+- Implemented string interpolation with formatting options for precision, padding, and alignment. Syntax: `"Value: ${num:2.3f}"` for floating point with 2 leading digits and 3 decimal places. (#1867)
+
+### Changed
+
+- Update default string encoding from UTF-8 to UTF-16 for better Windows compatibility. ⚠️ This is a breaking change for code that relies on byte-level string operations. [BRH-301]
+
+- Refactored module loading system to support circular dependencies through lazy evaluation. Modules with circular imports now resolve correctly without explicit forward declarations. (#1901)
+
+- Modify error reporting to include more context in stack traces, now showing variable values for primitive types. Error messages are now colorized in terminal output. (BRH-310)
+
+### Fixed
+
+- Fixed compiler crash when using nested lambda expressions with closure capture. The issue occurred in `eval_context()` when scope resolution failed for shadowed variables. (fixes #1847)
+
+- Resolved SEGFAULT in garbage collector during concurrent object allocation at brush.runtime.gc_collect:142. Reported by Emma Rodriguez <e.rodriguez@techcorp.io>
+
+- Fix memory leak in the parser when processing deeply nested expressions. The leak occurred because `parseExpression()` wasn't properly releasing AST nodes on error paths. (#1872)
+
+- Fixed incorrect type inference with generic higher-order functions that caused error E0308 "mismatched types". The type unification algorithm now correctly handles contravariance in function parameters. [BRH-315]
+
+- Patched race condition in async task scheduler that could cause deadlocks when many promises resolved simultaneously. The fix implements a lock-free queue for pending continuations. Reported by Alex Johnson.
+
+### Performance
+
+- Improved compiler throughput by 28% through better caching of type information during semantic analysis. Large projects now compile significantly faster. (#1888)
+
+- Optimized string operations to reduce memory allocations by 65% during string concatenation and interpolation. String operations are now 23% faster overall. (#1891)
+
+- Performance improvement in the garbage collector reducing pause times by 40% for heaps larger than 100MB. Collection now happens incrementally for large object graphs. [BRH-320]
+
+- Reduced runtime memory footprint from 8.4MB to 5.2MB through better memory layout and removal of redundant metadata. Thanks to Sarah Chen <s.chen@brushlang.org> for the optimization work.
+
+### Documentation
+
+- Update documentation for async/await syntax, previous examples was using deprecated callback style. (#2030)
+
+- Completely rewrote the "Memory Management Guide" with new sections on object lifetimes, reference cycles, and weak references. Now includes detailed diagrams of the heap layout. [BRH-325]
+
+- Fixed incorrect examples in the standard library documentation for src/stdlib/io.brush. Code samples now match the actual API. Reported by Chris Wong <cwong@example.com>

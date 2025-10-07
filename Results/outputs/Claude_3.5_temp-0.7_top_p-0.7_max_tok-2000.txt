@@ -1,0 +1,142 @@
+# VERSION_1.2.md
+
+# Brush Language - Version 1.2.0 Release Notes
+
+Released: March 8, 2025
+
+## Overview
+
+Brush 1.2.0 represents a significant milestone in the language's evolution, focusing on performance optimizations, enhanced type safety, and improved developer experience. This release addresses over 50 issues reported by the community while introducing several new features that expand Brush's capabilities in asynchronous programming and metaprogramming.
+
+We're excited to introduce the new async/await paradigm, which dramatically simplifies asynchronous code while maintaining Brush's commitment to predictable performance characteristics. Version 1.2 also brings substantial improvements to the compiler's type inference system, reducing verbosity without sacrificing type safety.
+
+## Highlights
+
+### Async/Await Pattern
+
+Brush now offers first-class support for asynchronous programming through the new `async` and `await` keywords. This implementation leverages zero-cost abstractions that compile to efficient state machines rather than allocating full closures. Developers can now write sequential-looking code that executes asynchronously without callback nesting.
+
+```brush
+async fn fetch_data(url: String) -> Result<Data, Error> {
+    let response = await http.get(url)?;
+    let data = await response.json()?;
+    return Ok(data);
+}
+```
+
+### Enhanced Type Inference
+
+The type inference system has been completely overhauled to support bidirectional type checking. The compiler can now infer complex generic types from context, significantly reducing the need for explicit type annotations. This improvement is particularly noticeable when working with higher-order functions and complex data structures.
+
+```brush
+// Before 1.2.0
+let result = map<int, string>(values, fn(x: int) -> string { return x.to_string(); });
+
+// After 1.2.0
+let result = map(values, fn(x) { return x.to_string(); });
+```
+
+### Pattern Matching Improvements
+
+Pattern matching now supports destructuring of nested data structures with improved ergonomics. The compiler provides more helpful error messages when patterns are refutable or incomplete. Guard clauses can now reference variables bound earlier in the same pattern, enabling more expressive matching logic.
+
+### Compile-Time Metaprogramming
+
+Version 1.2 introduces a stable API for compile-time code generation through the new `macro` system. Unlike the previous experimental `#compile_time` directive, macros are hygienic and integrate seamlessly with the module system. This feature enables library authors to eliminate boilerplate code without sacrificing type safety or IDE support.
+
+### Standard Library Enhancements
+
+The standard library has been expanded with new modules for common tasks:
+- `brush.time` for high-precision timing and date manipulation
+- `brush.fs.watch` for filesystem monitoring
+- `brush.collections.concurrent` for lock-free data structures
+- `brush.net.http2` for HTTP/2 client and server implementations
+
+## Breaking Changes
+
+⚠️ **String Encoding Change**: The default string encoding has changed from UTF-8 to UTF-16 for better cross-platform compatibility. Code that relies on byte-level string operations may need adjustment. See migration guide in docs/migration/1.1-to-1.2.md.
+
+⚠️ **Module Resolution**: The module resolution algorithm now prioritizes local modules over global ones when names conflict. This change improves isolation but may affect projects that relied on the previous behavior. Use the `--legacy-module-resolution` flag temporarily if needed.
+
+## Performance Improvements
+
+Compiler performance has been significantly enhanced, with a 35% reduction in compile time for large projects. The runtime memory footprint has been reduced from 7.8MB to 5.3MB through optimizations in the garbage collector and string interning system.
+
+The new incremental compilation system reduces rebuild times by up to 80% for projects with 100+ modules by tracking fine-grained dependencies between declarations. The standard library now loads 45% faster due to improved binary representation of pre-compiled modules.
+
+## Bug Fixes
+
+Version 1.2.0 includes fixes for 37 bugs reported since the 1.1 release. Major improvements include resolving memory leaks in the garbage collector, fixing parser recovery for malformed expressions, and addressing several edge cases in the type system. For a complete list of fixes, see CHANGELOG_1.2.md.
+
+## Deprecation Notices
+
+The following features are deprecated in 1.2.0 and will be removed in version 1.3:
+
+- The `#compile_time` directive is replaced by the new macro system
+- The `brush.async.callback` module is superseded by async/await
+- The `--old-type-inference` flag will be removed
+- The legacy `brush.net.http` module (use `brush.net.http2` instead)
+
+## Installation & Upgrade
+
+Brush 1.2.0 is compatible with 1.1.x modules but requires recompilation due to changes in the binary format. Developers upgrading from 1.1.x should run:
+
+```
+brush package upgrade --to 1.2.0
+brush build --clean
+```
+
+Projects using the deprecated features mentioned above will generate warnings during compilation. Use the `--strict-deprecation=error` flag to identify these issues before they become breaking changes in 1.3.
+
+## Dependencies
+
+- Requires LLVM 16.0+ (up from 15.0)
+- Compatible with GCC 12+ and Clang 14+
+- Windows builds now require Visual Studio 2022 or newer
+- The Brush Language Server now requires Node.js 18+ (up from 16)
+
+For more information on this release, including detailed API documentation and migration guides, visit the official documentation at https://docs.brushlang.org/1.2/.
+
+# CHANGELOG_1.2.md
+
+## [1.2.0] - 2025-03-08
+
+### Added
+
+- Implemented async/await syntax for asynchronous programming. The new model replaces callback-based APIs with a more intuitive sequential style while maintaining zero-cost abstractions. (#1840)
+
+- Added pattern matching support for nested destructuring with improved ergonomics. The compiler now provides better error messages for refutable patterns. [BRH-302]
+
+- Introduced stable macro system for compile-time metaprogramming. Unlike the experimental `#compile_time` directive, macros are hygienic and properly scoped. (fixes #1923)
+
+- New standard library modules: `brush.time`, `brush.fs.watch`, `brush.collections.concurrent`, and `brush.net.http2`. Thanks to Sarah Chen <s.chen@brushlang.org> for the concurrent collections implementation.
+
+### Changed
+
+- Default string encoding changed from UTF-8 to UTF-16 for better cross-platform compatibility. This is a breaking change for code that relies on byte-level string operations. [BRH-315]
+
+- Module resolution now prioritizes local modules over global ones when names conflict. Use the `--legacy-module-resolution` flag if needed for compatibility. (#1872)
+
+- Update documentation for async/await syntax, previous examples was using deprecated callback style. Reported by Mike Torres <mtorres@devco.net>
+
+- Enhanced type inference system with bidirectional type checking. The compiler can now infer complex generic types from context, reducing the need for explicit annotations. (#1901)
+
+### Fixed
+
+- Fixed compiler crash when using nested lambda expressions with closure capture. The issue occurred in `eval_context()` when scope resolution failed for shadowed variables. (fixes #1847)
+
+- Resolved SEGFAULT in garbage collector during concurrent object allocation. The error was traced to a race condition in `gc_collect()` when marking objects across threads. Reported by Emma Rodriguez <e.rodriguez@techcorp.io>
+
+- Fix parser recovery for malformed expressions containing unmatched delimiters. Previously this could cause cascading errors in unrelated code. (ERR_INVALID_TOKEN)
+
+- Addressed memory leak in the string interning system that occurred when loading modules with cyclic dependencies. The leak was identified at `src/runtime/string_pool.br:247`. (#1933)
+
+- Fixed incorrect type inference for generic functions with complex constraints. Error E0308 would incorrectly trigger when using valid type parameters. Thanks to John Smith <jsmith@email.com> for the detailed report.
+
+### Performance
+
+- Performance improvement in string interpolation - now 23% faster for strings with 10+ variables. The optimization eliminates redundant allocations in the intermediate representation. (#2301)
+
+- Reduced compiler memory usage by 42% for large projects through improved AST representation. The change affects how type information is stored during compilation. [BRH-329]
+
+- Incremental compilation now reduces rebuild times by up to 

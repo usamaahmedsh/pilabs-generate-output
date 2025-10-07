@@ -1,0 +1,175 @@
+# VERSION_1.2.md
+
+# Brush Language - Version 1.2.0 Release Notes
+
+Released: March 17, 2025
+
+## Overview
+
+Brush 1.2.0 represents a significant milestone in the language's evolution, focusing on performance optimizations, developer ergonomics, and expanded platform support. This release includes substantial improvements to the type system, memory management, and concurrency model, while maintaining backward compatibility with 1.1.x codebases.
+
+We're excited to introduce the new async/await syntax, which dramatically simplifies asynchronous programming patterns compared to the previous callback-based approach. Additionally, version 1.2 brings native support for ARM64 architecture, enabling Brush applications to run efficiently on a wider range of devices.
+
+## Highlights
+
+### Async/Await Pattern
+
+Brush now supports first-class async/await syntax for handling asynchronous operations. The runtime scheduler has been redesigned to efficiently manage promise-based execution with minimal overhead. This new approach reduces callback nesting and simplifies error handling across asynchronous boundaries.
+
+```brush
+async fn fetchData(url: String) -> Result<Data, Error> {
+    let response = await httpClient.get(url)?;
+    return parseData(response.body);
+}
+```
+
+### Enhanced Type Inference
+
+Version 1.2 introduces enhanced type inference for generic functions, significantly reducing the need for explicit type annotations. The compiler now performs bidirectional type checking during the constraint resolution phase, allowing it to infer complex generic types from context. This improvement is particularly noticeable in functional programming patterns involving higher-order functions and closures.
+
+```brush
+// Before 1.2:
+let result = map<int, string>(numbers, (n: int) => n.toString());
+
+// With 1.2:
+let result = map(numbers, n => n.toString());
+```
+
+### Native ARM64 Support
+
+Brush now provides native compilation support for ARM64 architecture. The compiler backend has been extended to generate optimized machine code for Apple Silicon, AWS Graviton, and other ARM64-based platforms. Performance benchmarks show that ARM64-compiled Brush applications achieve 95-98% of the performance of their x86-64 counterparts.
+
+### Improved Memory Management
+
+The garbage collector has been completely rewritten to use a generational approach with concurrent marking. This results in a 40% reduction in GC pause times and a 15% improvement in overall memory efficiency. Applications with large working sets will see the most significant performance gains, particularly in long-running server scenarios.
+
+### Pattern Matching Enhancements
+
+Pattern matching has been extended to support destructuring of custom types and deeper nested patterns. The compiler now performs exhaustiveness checking to ensure all possible cases are handled. This feature enables more expressive and safer code when working with complex data structures.
+
+```brush
+match shape {
+    Circle(radius) if radius > 10 => "Large circle",
+    Rectangle(width, height) if width == height => "Square",
+    Rectangle(w, h) => "Rectangle ${w}x${h}",
+    _ => "Other shape"
+}
+```
+
+## Breaking Changes
+
+⚠️ **String Encoding Change**: The default string encoding has changed from UTF-8 to UTF-16 for improved cross-platform compatibility. Existing code that relies on byte-level string operations may need adjustment. See migration guide in docs/migration/1.1-to-1.2.md.
+
+⚠️ **Module Resolution**: The module resolution algorithm now prioritizes local modules over global ones when names conflict. This change improves isolation but may affect applications that relied on the previous behavior. Use the `--legacy-module-resolution` flag temporarily if needed.
+
+## Bug Fixes
+
+Version 1.2 addresses 32 bugs, including several critical issues affecting the compiler, runtime, and standard library. Notable fixes include resolving memory leaks in the HTTP client, fixing parser crashes with nested lambda expressions, and correcting type inference issues with generic types. For a complete list of fixes, see CHANGELOG_1.2.md.
+
+## Performance Improvements
+
+- **Compiler Speed**: Compilation times reduced by 22% through improved incremental compilation and parallel type checking.
+- **Runtime Performance**: Overall application performance improved by 10-15% due to optimized method dispatch and better inlining.
+- **Memory Usage**: Runtime footprint reduced from 8.4MB to 5.7MB through more efficient data structures and improved string interning.
+- **Startup Time**: Cold start time decreased by 35% by optimizing the module loading sequence and lazy-loading standard library components.
+
+## Deprecation Notices
+
+The following features are deprecated in 1.2 and will be removed in version 1.3:
+
+- The `callback()` function for asynchronous operations is deprecated in favor of the new async/await syntax.
+- Legacy string manipulation functions in the `strings` module are deprecated; use the equivalent methods on the String type.
+- The `--old-gc` flag will be removed as the new garbage collector is now the default.
+
+## Installation & Upgrade
+
+Brush 1.2 is compatible with 1.1.x modules but requires recompilation for optimal performance. To upgrade:
+
+```
+brush package upgrade --version 1.2.0
+```
+
+Developers upgrading from 1.1.x should note that while most code will work without changes, applications relying on string byte representation or specific module resolution behavior may require adjustments. The migration tool can help identify potential issues:
+
+```
+brush migrate check --from 1.1 --to 1.2 path/to/project
+```
+
+## Dependencies
+
+- Requires LLVM 16.0+ for optimal code generation
+- Compatible with GCC 12+ and Clang 14+
+- Standard library now depends on libcurl 8.0.0 for HTTP operations
+- ARM64 support requires the ARM NEON SDK 2.3 or newer
+
+## Community Contributions
+
+This release includes contributions from 47 community developers. Special thanks to the performance optimization team led by Sarah Chen and the ARM64 port contributors coordinated by Miguel Rodriguez. See CONTRIBUTORS.md for a complete list of contributors to this release.
+
+For detailed information about all changes, please refer to the full changelog at CHANGELOG_1.2.md or visit our issue tracker for issues #1840-#1950.
+
+---
+
+# CHANGELOG_1.2.md
+
+## [1.2.0] - 2025-03-17
+
+### Added
+
+- Added async/await syntax for asynchronous programming. This replaces the callback-based approach with a more intuitive promise-based model. [BRH-187]
+
+- Implemented native ARM64 support for Apple Silicon and AWS Graviton platforms. Compilation now produces optimized binaries for ARM architecture. (#1872)
+
+- Added exhaustive pattern matching with support for custom type destructuring and guard clauses. The compiler now verifies all possible cases are handled. (fixes #1901)
+
+- New `brush.async.timeout(duration: int, callback: fn)` function for creating cancellable timeouts. Thanks to Mike Torres for the implementation.
+
+### Changed
+
+- Changed default string encoding from UTF-8 to UTF-16 for better cross-platform compatibility. ⚠️ This is a breaking change for code that relies on byte-level string operations. [BRH-302]
+
+- Updated module resolution algorithm to prioritize local modules over global ones when names conflict. Use `--legacy-module-resolution` flag if needed. (#1845)
+
+- Improved type inference system to better handle generic functions and reduce the need for explicit type annotations. The compiler now performs bidirectional type checking. (#1903)
+
+- Refactored standard library organization - moved networking functions from `net.brush` to dedicated modules. Old imports will continue to work but are deprecated. Reported by John Smith <jsmith@email.com>
+
+### Fixed
+
+- Fixed compiler crash when using nested lambda expressions with closure capture. The issue occurred in `eval_context()` when scope resolution failed for shadowed variables. (fixes #1847)
+
+- Resolved SEGFAULT in garbage collector during concurrent object allocation at brush.runtime.gc_collect:142. Reported by Emma Rodriguez <e.rodriguez@techcorp.io>
+
+- Fix incorrect type inference with generic collections containing function types. Error E0308 would incorrectly trigger when using map functions returning optional values. (#1862)
+
+- Fixed memory leak in HTTP client when connections were aborted during header parsing. The connection pool wasn't properly releasing resources in src/stdlib/net/http.br. (#1883)
+
+- Patched parser to correctly handle unicode escape sequences in string literals. Previously caused ERR_INVALID_TOKEN when using certain emoji characters. Fixed by Sarah Chen <s.chen@brushlang.org>
+
+- Resolved race condition in concurrent map implementation that could cause data corruption under high contention. The issue was in the resize operation at brush.collections.ConcurrentMap:315. (#1922)
+
+- Fix incorrect line numbers in error messages when source files contained tabs. Error locations were off by the number of tabs preceding the error. (fixes #1910)
+
+### Performance
+
+- Completely rewrote garbage collector to use generational approach with concurrent marking. Reduces GC pause times by 40% and improves memory efficiency by 15%. [BRH-290]
+
+- Performance improvement in string interpolation - now 23% faster for strings with 10+ variables. (#2301)
+
+- Optimized method dispatch for sealed classes, reducing call overhead by 30% in common cases. This particularly benefits code using the collections library. (#1899)
+
+- Improved startup time by 35% through lazy-loading of standard library components and optimized module loading sequence. (#1905)
+
+### Security
+
+- Fixed potential buffer overflow in `parseInteger()` when handling malformed input strings. Could lead to arbitrary code execution in specific contexts. [CVE-2025-1234]
+
+- Updated bundled OpenSSL to version 3.2.1 to address known vulnerabilities. All applications using TLS should upgrade. (#1937)
+
+### Documentation
+
+- Update documentation for async/await syntax, previous examples was using deprecated callback style. (#1940)
+
+- Expanded API reference with examples for all standard library functions. Documentation now includes performance characteristics and memory usage patterns. (#1925)
+
+- Fixed broken links in the networking guide and updated code samples to use the new module structure. Reported by Alex Johnson <alex@brushdev.net>

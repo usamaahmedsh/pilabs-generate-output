@@ -1,0 +1,145 @@
+# VERSION_1.2.md
+
+# Brush Language - Version 1.2.0 Release Notes
+
+**Released: March 24, 2025**
+
+## Overview
+
+Brush Language 1.2.0 represents a significant evolution in our programming language ecosystem, focusing on performance optimization, developer experience improvements, and enhanced stability. This release contains over 30 improvements and fixes that reinforce Brush's position as a versatile language for both systems and application programming.
+
+We're excited to introduce a completely redesigned asynchronous runtime that delivers substantial performance gains while maintaining backward compatibility with existing code. Version 1.2 also brings improved type inference capabilities, memory management optimizations, and important security enhancements to the standard library.
+
+## Highlights
+
+### Redesigned Asynchronous Runtime
+
+Version 1.2 introduces a completely rebuilt asynchronous runtime that reduces memory overhead by 35% and improves task scheduling efficiency. The new implementation uses a work-stealing scheduler with adaptive polling intervals that automatically adjusts based on system load. This enhancement is particularly beneficial for server applications handling thousands of concurrent connections.
+
+```brush
+// New async syntax supports both Promise-style and callback patterns
+let response = async.fetch("https://api.example.com/data")
+    .timeout(5000)
+    .then(data => parse_json(data))
+    .catch(err => handle_error(err));
+```
+
+### Enhanced Type Inference System
+
+The type inference system has been significantly enhanced, reducing the need for explicit type annotations by intelligently analyzing code context and usage patterns. The compiler now performs bidirectional type checking during constraint resolution, allowing it to correctly infer complex generic types even in nested higher-order functions. This improvement makes functional programming patterns more ergonomic while maintaining type safety.
+
+```brush
+// Before: Required explicit type annotations
+fn transform<T, U>(items: List<T>, mapper: fn(T) -> U): List<U> {
+    return items.map(mapper);
+}
+
+// After: Types inferred from context
+fn transform(items, mapper) {
+    return items.map(mapper);
+}
+```
+
+### Improved Memory Management
+
+Brush 1.2 implements a new region-based memory allocator that works alongside the existing garbage collector to reduce collection pauses by up to 60%. Short-lived objects can now be efficiently managed in specialized memory regions that are bulk-freed when they go out of scope. The compiler can automatically detect allocation patterns suitable for region-based management without explicit annotations.
+
+### Standard Library Enhancements
+
+The standard library has been expanded with new modules for secure cryptographic operations, improved filesystem access, and enhanced text processing capabilities. The `brush.secure` namespace now includes NIST-approved implementations of common cryptographic primitives with constant-time operations to prevent timing attacks. The `brush.io` module adds support for memory-mapped files and asynchronous directory operations.
+
+### Cross-Platform Improvements
+
+Version 1.2 significantly improves cross-platform consistency by standardizing filesystem path handling, environment variable access, and terminal control codes across all supported platforms. Windows users will particularly benefit from proper UTF-8 console support and standardized path handling that works identically to Unix-based systems.
+
+## Breaking Changes
+
+⚠️ **Date Formatting Change**: The default date formatting in `brush.time` has changed from MM/DD/YYYY to YYYY-MM-DD for ISO 8601 compliance. Applications relying on the default format will need to specify the legacy format explicitly using the new `format_legacy()` method.
+
+⚠️ **Random Number Generation**: The pseudo-random number generator implementation has been replaced with a cryptographically secure alternative. This improves security but may produce different sequences than previous versions. For backward compatibility, the old generator is available as `brush.math.LegacyRandom`.
+
+## Bug Fixes
+
+Version 1.2 includes numerous bug fixes addressing memory leaks, compiler crashes, and runtime errors. Notable fixes include resolution of a race condition in the parallel garbage collector, improved error handling in the module loader, and fixes for several edge cases in the type system. For a complete list of fixes, see CHANGELOG_1.2.md.
+
+## Performance Improvements
+
+- **Compiler Performance**: The compilation pipeline is now 27% faster through improved parallel processing and smarter incremental compilation detection.
+- **Runtime Footprint**: Memory usage has been reduced from 8.3MB to 5.7MB for typical applications.
+- **String Operations**: String manipulation operations are now 15-40% faster due to improved internal representation and specialized handling of ASCII-only strings.
+- **Module Loading**: Startup time for applications with many imports has been reduced by 45% through better caching of pre-compiled modules.
+
+## Deprecation Notices
+
+The following APIs are deprecated in Brush 1.2 and will be removed in version 2.0:
+
+- `brush.net.oldHttp` module - Use the new `brush.net.http` module instead
+- `brush.util.parseConfig()` function - Use the new `brush.config.parse()` instead
+- `--legacy-gc` compiler flag - The new GC implementation should be used for all new code
+
+## Installation & Upgrade
+
+Brush 1.2 is compatible with modules compiled for Brush 1.1.x, but recompilation is recommended to take advantage of the new optimizations. The compiler will automatically detect and adapt to older bytecode formats.
+
+Developers upgrading from version 1.1.x should note the breaking changes mentioned above and review their applications for use of deprecated APIs. The `brush-migrate` tool has been updated to automatically identify code affected by these changes.
+
+```bash
+# Install or upgrade Brush compiler
+$ package-manager install brush-lang@1.2.0
+
+# Run migration helper on existing projects
+$ brush-migrate --check ./my-project
+```
+
+## Dependencies
+
+- Requires LLVM 16.0+ for native code generation
+- Compatible with GCC 12+ and Clang 15+
+- Python 3.9+ required for build scripts
+- Node.js 18+ required for web tooling integration
+
+For a complete list of changes and detailed migration guides, visit the [Brush Language Documentation Portal](https://docs.brushlang.org/v1.2/).
+
+---
+
+# CHANGELOG_1.2.md
+
+## [1.2.0] - 2025-03-24
+
+### Added
+
+- Added new `brush.secure` module with NIST-approved cryptographic primitives and constant-time implementations (#2104)
+- Implemented region-based memory allocator that works alongside GC to reduce pauses by 60% [BRH-218]
+- Add support for multiple return values using tuple syntax. The compiler now correctly unpacks these values during assignment. (BRH-193)
+- New `brush.io.mmap()` function for memory-mapped file operations with both sync and async APIs. Thanks to Marcus Zhang for implementation help.
+
+### Changed
+
+- ⚠️ Changed default date formatting from MM/DD/YYYY to YYYY-MM-DD for ISO 8601 compliance (#2156)
+- ⚠️ Replaced pseudo-random number generator with cryptographically secure alternative (BRH-230)
+- Update string interpolation system - now 23% faster for strings with 10+ variables and handles recursive template evaluation correctly (#2301)
+- Refactored module loading system, resulting in 45% faster startup for applications with many imports. The new implementation caches compiled bytecode more efficiently. (#2288)
+- Changed error messages for type mismatches to include more context and suggested fixes. Error code E0308 now includes examples of valid types that would satisfy the constraints.
+
+### Fixed
+
+- Fixed compiler crash when using nested lambda expressions with closure capture. Issue occurred in `eval_context()` when scope resolution failed for shadowed variables (fixes #1847)
+- Fix race condition in parallel garbage collector that could cause premature object collection during `gc_collect()` [BRH-242]
+- Resolved SEGFAULT in concurrent object allocation (`at brush.runtime.eval:142`). Reported by Emma Rodriguez <e.rodriguez@techcorp.io>
+- Fixed memory leak in the HTTP client when connection errors occurred during stream reading. Memory was not properly freed in `src/stdlib/net/http_client.br` (fixes #1903)
+- Fix incorrect type inference with recursive generic types, previously causing error E0282 with "unable to infer complex type" message (#1921)
+- Patched security vulnerability in the deserialization module that could allow arbitrary code execution (CVE-2025-0422). Thank you to Security Team at BrushSec.
+
+### Performance
+
+- Improved compiler performance by 27% through enhanced parallel processing and smarter incremental compilation
+- Optimized string operations to be 15-40% faster by implementing specialized handling for ASCII-only strings
+- reduced memory footprint from 8.3MB to 5.7MB for typical applications by implementing more efficient internal data structures [BRH-256]
+- Improved pattern matching performance by 32% using optimized decision tree construction algorithm. Reported by John Lee <johnlee@brushlang.org>
+
+### Documentation
+
+- Update documentation for async/await syntax, previous examples was using deprecated callback style
+- Added comprehensive guide for the new region-based memory management system in docs/memory/regions.md
+- Fixed broken links and outdated examples in the standard library documentation (fixes #2201)
+- Added new section on cross-platform best practices to the developer guide. Thanks to Patricia Mendez for the contribution.

@@ -1,0 +1,109 @@
+```markdown
+# Brush Language - Version 1.2.0 Release Notes
+
+Released: January 15, 2025
+
+## Overview
+
+Version 1.2 of the Brush programming language introduces a suite of enhancements and optimizations designed to improve developer productivity and application performance. This release focuses on expanding the language's capabilities with new features, refining existing functionalities, and addressing critical bugs. We are excited to bring these improvements to the Brush community, enabling developers to write more efficient and expressive code.
+
+This release includes significant advancements in type inference, garbage collection, and string handling, among other areas. With these updates, developers can expect a smoother development experience and more robust application performance. Additionally, this version addresses several bugs reported by our community, ensuring a more stable and reliable environment.
+
+For a complete list of fixes, see [CHANGELOG_1.2.md](CHANGELOG_1.2.md).
+
+## Highlights
+
+### Enhanced Type Inference System
+
+Version 1.2 introduces an improved type inference system for generic functions, reducing the need for explicit type annotations. The compiler now employs bidirectional type checking during constraint resolution, allowing it to infer complex generic types from context. This is particularly beneficial in functional programming patterns involving higher-order functions and closures.
+
+### Improved Garbage Collection
+
+The garbage collector has been optimized to handle concurrent object allocations more efficiently. By refining the memory management algorithms, the runtime footprint has been reduced from 8MB to 5.2MB, enhancing application performance and stability.
+
+### New Asynchronous Timeout Function
+
+Developers can now utilize the `brush.async.timeout(duration: int, callback: fn)` function to execute asynchronous operations with a specified timeout. This feature simplifies the management of long-running tasks by providing a straightforward mechanism to handle timeouts.
+
+```brush
+brush.async.timeout(5000, fn() {
+    println("Operation timed out!");
+});
+```
+
+### String Interpolation Performance
+
+String interpolation has been optimized, resulting in a 23% performance improvement for strings with 10 or more variables. This enhancement reduces the overhead associated with complex string operations, making Brush applications faster and more responsive.
+
+### Enhanced Security Features
+
+Security has been bolstered with additional checks and patches to prevent vulnerabilities. This includes stricter validation of input data and improved handling of potentially unsafe operations.
+
+## Breaking Changes
+
+⚠️ **String Encoding Change**: The default string encoding has changed from UTF-8 to UTF-16 for Windows compatibility. Existing code that relies on byte-level string operations may need adjustment. See migration guide in `docs/migration/1.1-to-1.2.md`.
+
+## Bug Fixes
+
+This release addresses several critical bugs, improving the overall stability and reliability of the Brush language. For detailed information on specific fixes, refer to the [CHANGELOG_1.2.md](CHANGELOG_1.2.md).
+
+## Performance Improvements
+
+- 15% reduction in compile time due to optimizations in the parser and lexer.
+- 40% smaller binary size achieved through refined code generation techniques.
+
+## Deprecation Notices
+
+- The `oldCallbackStyle()` function is deprecated and will be removed in version 1.3. Developers are encouraged to use the new async/await syntax.
+
+## Installation & Upgrade
+
+To upgrade to Brush 1.2, ensure your environment meets the updated dependencies: LLVM 15.0+ and GCC 11+. Follow the installation instructions in the `docs/installation.md` for a seamless upgrade process.
+
+## Dependencies
+
+- Updated to LLVM 15.0+
+- Compatible with GCC 11+
+- Requires OpenSSL 3.0 for enhanced security features
+
+---
+
+```markdown
+## [1.2.0] - 2025-01-15
+
+### Added
+
+- Introduced `brush.async.timeout(duration: int, callback: fn)` for managing asynchronous operations with timeouts. This simplifies handling long-running tasks (#1920).
+- Added support for UTF-16 string encoding to improve Windows compatibility. Developers can now handle a wider range of international characters more efficiently [BRH-315].
+
+### Changed
+
+- Updated type inference system to support more complex generic functions. This change enhances the compiler's ability to deduce types without explicit annotations (fixes #1883).
+- Modified garbage collector to improve concurrent object allocation performance. Memory management algorithms have been refined for better efficiency.
+
+### Fixed
+
+- Fixed a bug causing the compiler to crash when using nested lambda expressions with closure capture. The issue was in `eval_context()` during scope resolution (fixes #1847).
+- Resolved SEGFAULT in garbage collector during concurrent object allocation. Reported by Emma Rodriguez <e.rodriguez@techcorp.io>
+- Addressed memory leak in `gc_collect()` that occurred during heavy object creation. The leak was traced to an unreferenced pointer in `src/runtime/memory.br` (fixes #1902).
+- Corrected error E0308 in `parseExpression()` when handling Token.IDENTIFIER. This fix ensures proper type matching during parsing. Thanks to Mike Torres for reporting.
+
+### Security
+
+- Patched a vulnerability in the standard library's I/O module (`stdlib/io.brush`) that could lead to unauthorized file access. The patch includes stricter validation of file paths (fixes #1945).
+
+### Deprecated
+
+- Deprecated `oldCallbackStyle()` in favor of the new async/await syntax. This function will be removed in version 1.3. Update your code to use the modern syntax.
+
+### Performance
+
+- Performance improvement in string interpolation - now 23% faster for strings with 10+ variables (#2301).
+- Reduced runtime footprint from 8MB to 5.2MB by optimizing memory management routines.
+
+### Documentation
+
+- Updated documentation for async/await syntax, previous examples was using deprecated callback style. Fixed by Sarah Chen <s.chen@brushlang.org>
+- Revised migration guide for transitioning from version 1.1 to 1.2, including code examples and best practices.
+
+```

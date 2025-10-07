@@ -1,0 +1,82 @@
+# Brush Language - Version 1.2.0 Release Notes
+
+**Release Date:** October 15, 2023
+
+## Overview
+
+The Brush Language team is thrilled to announce the release of version 1.2.0, which brings a number of exciting new features, essential bug fixes, and performance enhancements. This release continues our commitment to improving the language's stability, performance, and user experience. As you explore the new capabilities of Brush, you'll find improvements that streamline your development process and enhance code execution efficiency.
+
+## Highlights
+
+- **Enhanced Syntax Highlighting:** Improved syntax highlighting in the Brush IDE, offering better readability and more vibrant color differentiation for keywords and operators.
+- **New File I/O Functions:** Introduced `readFile()` and `writeFile()` functions allowing more efficient file operations with improved error handling and faster execution.
+- **Optimized Memory Management:** Reduced memory overhead by 15% through enhanced garbage collection algorithms, making Brush more suitable for resource-constrained environments.
+- **Improved Security Features:** Added new encryption functions `encryptData()` and `decryptData()` to bolster data security in Brush applications.
+
+## Breaking Changes
+
+- **Deprecation of `oldFunction()`**: The function `oldFunction()` has been deprecated and replaced with `newFunction()`. It is recommended to refactor existing codebases to use `newFunction()` for better performance and future compatibility.
+  - **Migration Notes:** 
+    ```brush
+    // Old code
+    oldFunction(param1, param2);
+
+    // Updated code
+    newFunction(param1, param2);
+    ```
+
+## Bug Fixes
+
+- Resolved issues with the `parseData()` function incorrectly handling null values which caused runtime errors in large datasets.
+- Corrected the typo in error message `Error: File not fount` to `Error: File not found` in file_operations.js.
+
+For a detailed list of changes, please see the [CHANGELOG_1.2.md](./CHANGELOG_1.2.md).
+
+## Performance Improvements
+
+- Enhanced the `sortArray()` function, resulting in a 20% reduction in execution time for large data sets by optimizing the underlying algorithm.
+- Reduced startup time by 10% through lazy loading of certain modules.
+
+## Dependencies
+
+- Updated dependency on `BrushStandardLib` to version 2.3.0 to leverage the latest enhancements and security patches.
+- Minimum required version of `BrushCompiler` increased to 1.1.5 to support the new language features.
+
+We appreciate the community's contributions and feedback, which have been invaluable in this release. We look forward to your continued support and suggestions for future versions.
+
+---
+
+# CHANGELOG_1.2.md
+
+## [1.2.0] - October 15, 2023
+
+### Added
+
+- Introduced the `readFile()` and `writeFile()` functions for efficient file operations, improving error handling and speed.
+- Added new encryption methods `encryptData()` and `decryptData()` to enhance data security in applications (#1124).
+
+### Fixed
+
+- Fixed a critical bug where `parseData()` would crash on null inputs, improving stability for data processing tasks (Thanks to Alex Johnson, alex.j@example.com).
+- Corrected spelling error in the error message `Error: File not fount` to `Error: File not found` in file_operations.js.
+
+### Changed
+
+- Updated garbage collection mechanisms, reducing memory overhead by 15% in typical applications (Contributed by Emily Zhang, emily.z@example.org).
+- Modified the `sortArray()` function for improved runtime performance, achieving a 20% speedup on average.
+
+### Security
+
+- Enhanced security by integrating new hashing algorithms in the `hashPassword()` function, providing stronger resistance against attacks (See [BRH-342] for details).
+
+### Performance
+
+- Improved startup time by 10% by implementing lazy loading for non-critical modules during initialization.
+- Optimized the `compile()` function, significantly decreasing compile time for large projects.
+
+### Documentation
+
+- Updated the user guide with examples for the new `readFile()` and `writeFile()` functions (See user_guide.md).
+- Corrected several typos in the API documentation and clarified descriptions of the new encryption functions (Thanks to John Doe, john@example.com).
+
+We are grateful for the contributions from our community and invite feedback to help us refine and improve future releases.

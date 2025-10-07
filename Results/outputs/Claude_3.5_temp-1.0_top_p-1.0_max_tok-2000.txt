@@ -1,0 +1,156 @@
+# VERSION_1.2.md
+
+# Brush Language - Version 1.2.0 Release Notes
+
+Released: March 8, 2025
+
+## Overview
+
+Brush 1.2.0 represents a significant milestone in the language's evolution, focusing on performance optimization, improved type safety, and developer experience enhancements. This release introduces native multithreading support, an enhanced module system, and substantial improvements to the compiler infrastructure.
+
+The core team has addressed over 50 issues reported since the 1.1 release, including critical bug fixes, memory management improvements, and compiler optimizations. We're particularly excited to introduce the new pattern matching syntax, which enables more expressive and safer code when working with complex data structures.
+
+## Highlights
+
+### Native Multithreading Support
+
+Brush now provides first-class support for concurrent programming with the introduction of native threads. The new `thread` module exposes a clean API for spawning and synchronizing threads, with automatic resource cleanup and cancellation support. Thread safety is enforced at compile-time through the new ownership model, significantly reducing the risk of race conditions.
+
+```brush
+import thread
+
+fn process_data(items: Array<int>) -> int {
+  let threads = items.chunks(4).map(|chunk| {
+    thread.spawn(|| {
+      return chunk.map(process_item).sum()
+    })
+  })
+  
+  return threads.join().sum()
+}
+```
+
+### Enhanced Pattern Matching
+
+Version 1.2 brings comprehensive pattern matching capabilities, allowing developers to safely destructure complex data structures with compile-time exhaustiveness checking. The pattern matching system integrates deeply with the type system, ensuring all possible cases are handled at compile time.
+
+```brush
+match response {
+  Success(data) if data.is_complete() => {
+    process_complete_data(data)
+  },
+  Success(data) => {
+    request_additional_data(data.id)
+  },
+  Error(NetworkError(code)) if code >= 500 => {
+    retry_with_backoff()
+  },
+  Error(err) => {
+    log.error("Failed with: ${err}")
+  }
+}
+```
+
+### Improved Module System
+
+The module system has been completely redesigned to support better encapsulation, circular dependencies, and lazy loading. Modules now support explicit public/private interfaces, conditional exports, and versioned imports. The new system reduces compile times by up to 35% for large projects through smarter dependency tracking and incremental compilation.
+
+### Type System Enhancements
+
+The type system now supports higher-kinded types, allowing for more powerful generic abstractions. We've also implemented improved type inference with bidirectional typing, reducing the need for explicit type annotations by 60% in typical code. These changes make Brush's type system more expressive while maintaining its strong safety guarantees.
+
+### Memory Management Optimizations
+
+The garbage collector has been rewritten with a generational design that reduces collection pauses by 78% on average. Long-running applications will see significantly reduced memory fragmentation and lower overall memory usage. The new allocator also implements thread-local allocation pools, reducing contention in multithreaded applications.
+
+## Breaking Changes
+
+⚠️ **Module Path Resolution**: The algorithm for resolving module paths has changed to prioritize local modules over standard library modules with the same name. Code that relies on implicit standard library imports may need to be updated with explicit imports.
+
+⚠️ **Operator Precedence Changes**: The precedence of the pipeline operator (`|>`) has been adjusted to be lower than comparison operators. Code that combines these operators without parentheses may have different behavior.
+
+⚠️ **String API Changes**: Several string methods have been deprecated in favor of more consistent alternatives. See `docs/migration/string_api_changes.md` for a complete list and migration guide.
+
+## Bug Fixes
+
+This release includes 27 bug fixes addressing issues ranging from compiler crashes on complex generic expressions to runtime performance degradation in the standard library. Significant fixes include resolving memory leaks in the async runtime, fixing incorrect type inference with nested lambda expressions, and addressing performance regressions in the string interpolation system.
+
+For a complete list of fixes, please refer to the [CHANGELOG_1.2.md](./CHANGELOG_1.2.md) file.
+
+## Performance Improvements
+
+- **Compiler Speed**: Overall compilation time reduced by 22% through optimized parsing and more efficient type checking algorithms.
+- **Runtime Performance**: Standard library functions are now 15-30% faster on average, with string and collection operations seeing the largest gains.
+- **Memory Usage**: Runtime footprint reduced from 12.8MB to 8.3MB for typical applications through improved data structure layouts and smarter memory management.
+- **Binary Size**: Compiler-generated executables are now 18% smaller due to better dead code elimination and optimized code generation.
+
+## Deprecation Notices
+
+The following features are deprecated in 1.2.0 and will be removed in version 1.3:
+
+- The `old_io` module - use the new `io` module instead
+- The `unsafe_cast()` function - use the type-safe `try_cast()` function instead
+- The `@deprecated` attribute syntax - use the new `#[deprecated]` attribute syntax
+- The `ThreadPool.create()` factory method - use `ThreadPool.new()` instead
+
+## Installation & Upgrade
+
+Brush 1.2.0 can be installed via the official package manager:
+
+```
+brush-pkg install brush@1.2.0
+```
+
+Developers upgrading from 1.1.x should run the automatic migration tool to identify potential issues:
+
+```
+brush migrate --from 1.1 --to 1.2 --path ./your-project
+```
+
+The migration tool will highlight code that needs attention due to breaking changes and offer automated fixes for common issues.
+
+## Dependencies
+
+- Requires LLVM 16.0+ for optimal performance
+- Compatible with GCC 12+ and Clang 15+
+- Windows builds require Visual Studio 2022 (17.0+)
+- Minimum supported OS versions:
+  - Linux: Kernel 5.4+
+  - macOS: 12.0+ (Monterey)
+  - Windows: 10 (20H2) or 11
+
+## Community Contributions
+
+This release includes contributions from 24 community members. Special thanks to Sarah Chen, Mike Torres, and Emma Rodriguez for their significant work on the multithreading subsystem and compiler improvements.
+
+For more information about contributing to Brush, please visit our [contributor guide](https://brushlang.org/contribute).
+
+---
+
+# CHANGELOG_1.2.md
+
+## [1.2.0] - 2025-03-08
+
+### Added
+
+- Added native multithreading support through the `thread` module with thread-safe primitives (#1902)
+- Introduced pattern matching with exhaustiveness checking for complex data structures. Pattern matching integrates with the type system to ensure all cases are handled at compile-time [BRH-245]
+- Added support for higher-kinded types, allowing more expressive generic abstractions in library code (fixes #1856)
+- Implement bidirectional type inference to reduce the need for explicit type annotations. Thanks to Sarah Chen <s.chen@brushlang.org>
+
+### Changed
+
+- Redesigned module system with explicit public/private interfaces and conditional exports. The new system reduces compile times by ~35% for large projects [BRH-301]
+- Changed module path resolution to prioritize local modules over standard library modules with identical names (#1923)
+- Update precedence rules for pipeline operator (`|>`) to be lower than comparison operators ⚠️ This may change behavior in existing code
+- Deprecated the `old_io` module in favor of the new `io` module which provides more consistent error handling. The old module will be removed in 1.3.0.
+
+### Fixed
+
+- Fixed compiler crash when using nested lambda expressions with closure capture. The issue occurred in `eval_context()` when scope resolution failed for shadowed variables (fixes #1847)
+- Resolved memory leak in async runtime when canceling operations with active resources. Memory was not being properly released when a Future was abandoned [BRH-302]
+- Fix incorrect type inference when using generic methods with complex constraint bounds. Reported by Mike Torres <mtorres@debuggingtools.com>
+- Fixed stack overflow in recursive pattern matching with deeply nested structures at brush.runtime.eval:142 (fixes #1881)
+- Resolve SEGFAULT_0x7f when deallocating cyclic object references during garbage collection under heavy memory pressure
+- Fixed regression in string interpolation performance for templates with many variables. Parsing is now 23% faster for strings with 10+ variables (#2034)
+- Update documentation for async/await syntax, previous examples was

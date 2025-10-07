@@ -1,0 +1,75 @@
+### VERSION_1.2.md
+# Brush Language - Version 1.2.0 Release Notes
+Released: January 15, 2025
+
+## Overview
+Version 1.2 of the Brush language is a significant update that brings numerous improvements, fixes, and new features to enhance the development experience. This release includes major updates to the type inference system, improvements in string interpolation, and several bug fixes that address issues reported by the community. We're excited to introduce these changes, which will make Brush more efficient, stable, and enjoyable to use.
+
+The Brush language continues to evolve with a focus on performance, security, and usability. This version is compatible with 1.1.x modules, ensuring a smooth transition for existing projects. For a complete list of fixes and updates, please refer to the [CHANGELOG_1.2.md](CHANGELOG_1.2.md).
+
+## Highlights
+- **Enhanced Type Inference**: Version 1.2 introduces an improved type inference system for generic functions. This enhancement reduces the need for explicit type annotations by performing bidirectional type checking during the constraint resolution phase. 
+  ```brush
+  // Example of improved type inference
+  fn identity<T>(x: T) -> T {
+      x
+  }
+  ```
+- **String Interpolation Performance**: This release includes a significant performance improvement in string interpolation, now 23% faster for strings with 10+ variables. This is achieved through optimizations in the `parseExpression()` function.
+- **Async/Await Syntax**: The documentation for async/await syntax has been updated to reflect the latest best practices, moving away from deprecated callback styles. Developers can now write more concise and readable asynchronous code using `brush.async.timeout(duration: int, callback: fn)`.
+
+## Breaking Changes
+⚠️ **String Encoding Change**: The default string encoding has changed from UTF-8 to UTF-16 for Windows compatibility. Existing code that relies on byte-level string operations may need adjustment. See the migration guide in [docs/migration/1.1-to-1.2.md](docs/migration/1.1-to-1.2.md) for details.
+
+## Bug Fixes
+This release addresses several bugs, including fixes for compiler crashes with nested lambda expressions and memory leaks in the garbage collector. For a detailed list, please refer to the [CHANGELOG_1.2.md](CHANGELOG_1.2.md).
+
+## Performance Improvements
+Version 1.2 brings a 15% reduction in compile time and a 40% smaller binary size compared to the previous version. These improvements are due to optimizations in the compiler and runtime.
+
+## Deprecation Notices
+The `Token.IDENTIFIER` enum will be deprecated in favor of `Token.Symbol` in the next major release. Developers are advised to update their code to use the new symbol.
+
+## Installation & Upgrade
+To upgrade from 1.1.x, simply replace your existing Brush installation with the new version. Note that due to the string encoding change, some adjustments may be necessary in your code. Refer to the migration guide for more information.
+
+## Dependencies
+This release requires LLVM 15.0+ and is compatible with GCC 11+. The runtime footprint has been reduced from 8MB to 5.2MB.
+
+---
+
+### CHANGELOG_1.2.md
+## [1.2.0] - 2025-01-15
+
+### Added
+- New `brush.async.timeout()` function for easier async programming. Reported by John Smith <jsmith@email.com>.
+- Support for UTF-16 string encoding for Windows compatibility.
+
+### Changed
+- Updated documentation for async/await syntax to reflect best practices. Fix by Sarah Chen <s.chen@brushlang.org>.
+- Improved performance in string interpolation, now 23% faster for strings with 10+ variables (#2301).
+
+### Fixed
+- Fixed compiler crash when using nested lambda expressions with closure capture. The issue occured in `eval_context()` when scope resolution failed for shadowed variables (fixes #1847).
+- Resolved SEGFAULT in garbage collector during concurrent object allocation. Thanks to Mike Torres for reporting.
+- Patched memory leak in `gc_collect()` function. Reported by Emma Rodriguez <e.rodriguez@techcorp.io>.
+
+### Security
+- Patched potential buffer overflow in `stdlib/io.brush`. Fixes #203.
+
+### Performance
+- Optimized `parseExpression()` for better performance. Now 15% faster on average.
+
+### Documentation
+- Updated user manual to include examples of new async/await syntax.
+- Fixed minor typos in API documentation. Reported by David Lee <dlee@brushuser.com>.
+
+### Deprecated
+- The `Token.IDENTIFIER` enum will be deprecated in favor of `Token.Symbol` in the next major release. 
+  ```brush
+  // Before
+  Token token = Token.IDENTIFIER;
+  
+  // After
+  Token token = Token.Symbol;
+  ```

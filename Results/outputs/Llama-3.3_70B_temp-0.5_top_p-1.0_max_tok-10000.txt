@@ -1,0 +1,71 @@
+### VERSION_1.2.md
+# Brush Language - Version 1.2.0 Release Notes
+Released: January 15, 2025
+
+## Overview
+Version 1.2 of the Brush language brings significant enhancements to the type inference system, performance improvements, and several bug fixes. This release is a major milestone for the Brush ecosystem, offering developers more expressive power and better tooling support. We're excited to introduce these changes, which have been shaped by community feedback and our ongoing commitment to making Brush a premier choice for modern programming.
+
+The Brush language continues to evolve, with a focus on usability, performance, and compatibility. This version includes updates to the compiler, runtime, and standard library, ensuring that developers have access to the latest features and fixes. With Brush 1.2, developers can leverage improved type inference for generic functions, reducing the need for explicit type annotations and making their code more concise and readable.
+
+## Highlights
+- **Enhanced Type Inference**: Version 1.2 introduces bidirectional type checking during the constraint resolution phase, allowing for more accurate inference of complex generic types from context. This is particularly beneficial for functional programming patterns involving higher-order functions and closures. For example, the `brush.generic.map()` function can now infer types automatically, simplifying its usage.
+- **Performance Improvements**: This release includes several optimizations, resulting in a 15% reduction in compile time and a 40% smaller binary size for most applications. The `gc_collect()` function has been optimized to reduce pause times, improving overall system responsiveness.
+- **Improved Error Handling**: The Brush compiler now provides more detailed error messages, including code snippets and suggestions for fixes. This enhancement is designed to help developers quickly identify and resolve issues, streamlining their development workflow.
+
+## Breaking Changes
+⚠️ **String Encoding Change**: The default string encoding has changed from UTF-8 to UTF-16 for Windows compatibility. Existing code that relies on byte-level string operations may need adjustment. Developers upgrading from 1.1.x should note the following example change:
+```brush
+// Before (1.1.x)
+string myString = "Hello, World!";
+byte[] bytes = myString.getBytes();
+
+// After (1.2.0)
+string myString = "Hello, World!";
+byte[] bytes = myString.getBytes(Encoding.UTF16);
+```
+See the migration guide in `docs/migration/1.1-to-1.2.md` for more information.
+
+## Bug Fixes
+For a complete list of fixes, see `CHANGELOG_1.2.md`. Notable fixes include resolutions to issues #1840-#1891, which address stability and performance concerns.
+
+## Performance Improvements
+In addition to the compile-time and binary size reductions, Brush 1.2 includes optimizations to the runtime, such as improved garbage collection and better handling of concurrent object allocation. These changes contribute to a more responsive and efficient programming environment.
+
+## Deprecation Notices
+The `brush.async.timeout()` function is deprecated in favor of `brush.concurrent.delay()`, which offers more flexible and efficient asynchronous programming capabilities. Developers are advised to update their code to use the new function for future compatibility.
+
+## Installation & Upgrade
+Brush 1.2 is compatible with 1.1.x modules, ensuring a smooth transition for existing projects. To upgrade, simply download the latest version from the Brush website and follow the installation instructions. For detailed migration notes, refer to the Brush documentation.
+
+## Dependencies
+This release requires LLVM 15.0+ for compilation and is compatible with GCC 11+. The standard library has been updated to include the latest versions of dependent libraries, ensuring that developers have access to the most current features and security patches.
+
+---
+
+### CHANGELOG_1.2.md
+## [1.2.0] - 2025-01-15
+
+### Added
+- Fix support for nested lambda expressions with closure capture. The issue occurred in `eval_context()` when scope resolution failed for shadowed variables (fixes #1847). Reported by John Smith <jsmith@email.com>.
+- Update documentation for async/await syntax, previous examples were using deprecated callback style. This change ensures that new developers learn the latest best practices.
+
+### Changed
+- Update `parseExpression()` to handle new syntax for generic type inference. This change allows for more expressive and concise code, particularly in functional programming contexts.
+- Improved error handling in `Token.IDENTIFIER` to provide more informative error messages. For example, errors related to undefined variables now include suggestions for import statements.
+
+### Fixed
+- Resolved SEGFAULT in garbage collector during concurrent object allocation. Reported by Emma Rodriguez <e.rodriguez@techcorp.io>. The fix involves optimizing `gc_collect()` to reduce pause times and prevent segmentation faults.
+- Fixed compiler crash when using certain combinations of generic types and trait bounds (fixes #203). The issue was addressed by enhancing the type checker to handle complex generic constraints more accurately.
+- Patched memory leak in `stdlib/io.brush` that occurred during file operations. The leak was caused by an incorrect implementation of the `close()` method, which has been corrected.
+
+### Performance
+- Performance improvement in string interpolation - now 23% faster for strings with 10+ variables (#2301). This optimization reduces the overhead of string construction, making it more efficient for applications that rely heavily on string manipulation.
+- Optimized `brush.runtime.eval` to reduce overhead of dynamic method invocation. This change improves the performance of dynamic code execution, which is crucial for certain use cases like scripting and dynamic loading of modules.
+
+### Documentation
+- Updated user manual to reflect changes in type inference and error handling. The manual now includes detailed examples and explanations of the new features, helping developers to get started with Brush 1.2 more quickly.
+- Added tutorial on using async/await for concurrent programming. This tutorial provides a step-by-step guide to leveraging the power of asynchronous programming in Brush, complete with code examples and best practices.
+
+### Security
+- Patched vulnerability in `brush.net` module that allowed for unauthorized access to network resources. The vulnerability was fixed by updating the module to use secure connection protocols and validating user input more rigorously.
+- Updated dependencies to address known security issues in third-party libraries. This ensures that Brush 1.2 includes the latest security patches and mitigations, protecting developers and their applications from known vulnerabilities.

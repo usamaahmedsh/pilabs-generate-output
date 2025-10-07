@@ -1,0 +1,104 @@
+```markdown
+# Brush Language - Version 1.2.0 Release Notes
+
+Released: January 15, 2025
+
+## Overview
+
+Version 1.2 of the Brush programming language brings a host of new features, optimizations, and crucial bug fixes to enhance developer productivity and application performance. This release focuses on improving the language's core capabilities, offering more robust and efficient tools for building scalable applications. Developers can now take advantage of new asynchronous programming constructs and improved type inference, among other enhancements.
+
+We're excited to introduce several major features that have been highly requested by the community. These include a revamped garbage collector, enhanced concurrency support, and significant improvements in compile-time performance. Additionally, this version addresses numerous bugs and introduces some deprecations to streamline future development.
+
+For a complete list of fixes and updates, please refer to CHANGELOG_1.2.md. We recommend reviewing the migration notes for any potential breaking changes that may affect your existing projects.
+
+## Highlights
+
+### Enhanced Asynchronous Programming
+
+Version 1.2 introduces the `brush.async.timeout(duration: int, callback: fn)` function, enabling developers to implement timeouts for asynchronous operations easily. This feature is built on a new event loop mechanism that efficiently manages concurrent tasks. For example, setting a timeout for an HTTP request can now be done with minimal code, improving both readability and reliability.
+
+### Improved Type Inference System
+
+The type inference system has been enhanced to better handle generic functions, reducing the need for explicit type annotations. The compiler now performs bidirectional type checking during constraint resolution, which is particularly beneficial for functional programming patterns. This improvement allows for more concise and expressive code.
+
+### Revamped Garbage Collector
+
+The garbage collector has been overhauled to reduce memory footprint and improve runtime performance. The new generational garbage collection algorithm reduces pause times and increases throughput, particularly in applications with high object churn. As a result, developers can expect a 15% reduction in runtime memory usage.
+
+### Concurrency Enhancements
+
+Concurrency support has been expanded with new primitives for parallel execution. The introduction of lightweight threads allows for better utilization of multi-core processors. This change is expected to yield up to a 40% improvement in execution speed for compute-intensive tasks.
+
+### String Interpolation Optimization
+
+String interpolation now operates 23% faster for strings with multiple variables, thanks to a new parsing strategy that minimizes intermediate allocations. This optimization is particularly beneficial for applications that heavily rely on dynamic string generation.
+
+## Breaking Changes
+
+⚠️ **String Encoding Change**: The default string encoding has changed from UTF-8 to UTF-16 for Windows compatibility. Existing code that relies on byte-level string operations may need adjustment. See migration guide in docs/migration/1.1-to-1.2.md.
+
+## Bug Fixes
+
+This release includes numerous bug fixes that address issues reported by our users. For detailed information on each fix, please see CHANGELOG_1.2.md.
+
+## Performance Improvements
+
+The compiler now generates binaries that are 40% smaller, thanks to optimizations in the code generation phase. Additionally, compile times have been reduced by 15%, allowing for faster development cycles.
+
+## Deprecation Notices
+
+Several legacy APIs have been marked as deprecated and will be removed in future versions. Developers are encouraged to transition to the new APIs to ensure compatibility with upcoming releases.
+
+## Installation & Upgrade
+
+To upgrade to version 1.2, follow the installation instructions provided in the documentation. Developers upgrading from 1.1.x should note the changes in string encoding and adjust their code accordingly.
+
+## Dependencies
+
+Brush 1.2 requires LLVM 15.0+ and is compatible with GCC 11+. Ensure your development environment meets these requirements before upgrading.
+
+---
+
+# CHANGELOG_1.2.md
+
+## [1.2.0] - 2025-01-15
+
+### Added
+
+- Introduced `brush.async.timeout(duration: int, callback: fn)` for handling asynchronous operation timeouts (#1902).
+- Added support for lightweight threads to enhance concurrency capabilities. This allows for more efficient parallel execution of tasks (fixes #1910).
+
+### Changed
+
+- Updated the garbage collector to use a generational algorithm, reducing pause times and improving throughput (reported by Mike Torres).
+- String interpolation performance improved by 23% through optimized parsing logic (#2301).
+
+### Fixed
+
+- Fixed compiler crash when using nested lambda expressions with closure capture. The issue occurred in `eval_context()` when scope resolution failed for shadowed variables (fixes #1847).
+- Resolved SEGFAULT in garbage collector during concurrent object allocation. Reported by Emma Rodriguez <e.rodriguez@techcorp.io>
+- Fixed type inference issue in `parseExpression()` where complex generics were not inferred correctly (E0308).
+- Addressed memory leak in `gc_collect()` that occurred during high-frequency object creation. Thanks to John Smith <jsmith@email.com> for reporting.
+
+### Security
+
+- Patched vulnerability in stdlib/io.brush where file handles were not properly closed, potentially leading to resource exhaustion (fixes #1984).
+
+### Deprecated
+
+- Deprecated old async callback style in favor of new async/await syntax. Update your codebase to avoid future compatibility issues.
+
+### Performance
+
+- Compiler optimization reduces binary size by 40%, enhancing deployment efficiency (#1932).
+- Improved compile time by 15% through better AST node caching strategies.
+
+### Documentation
+
+- Updated documentation for async/await syntax, previous examples was using deprecated callback style.
+- Clarified usage of Token.IDENTIFIER in lexer documentation (src/compiler/lexer.br).
+
+---
+
+For more details on specific issues, please refer to the issue tracker or the migration guide provided in the documentation.
+```

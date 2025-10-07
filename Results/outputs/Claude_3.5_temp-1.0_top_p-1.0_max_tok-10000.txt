@@ -1,0 +1,167 @@
+# VERSION_1.2.md
+
+# Brush Language - Version 1.2.0 Release Notes
+
+Released: February 8, 2025
+
+## Overview
+
+Brush 1.2.0 represents a significant milestone in the evolution of the language, introducing powerful new features while maintaining the simplicity and elegance that developers have come to appreciate. This release focuses on performance enhancements, developer productivity, and expanded platform compatibility, enabling more robust applications across a wider range of environments.
+
+We're excited to introduce the long-awaited asynchronous programming model, bringing modern concurrency patterns to Brush without sacrificing its predictable execution model. Version 1.2 also delivers substantial compiler optimizations, resulting in faster compilation times and more efficient runtime performance.
+
+## Highlights
+
+### Comprehensive Async/Await Support
+
+Version 1.2 introduces first-class async/await functionality, enabling straightforward concurrent programming without callback complexity. The implementation leverages a lightweight task scheduler that efficiently maps asynchronous operations to the underlying platform's threading model. Developers can use the new `async` keyword with functions and the `await` operator to pause execution until asynchronous operations complete.
+
+```brush
+async fn fetchUserData(userId: int) -> UserProfile {
+    let response = await httpClient.get(`/api/users/${userId}`);
+    let data = await response.json();
+    return UserProfile.fromJSON(data);
+}
+```
+
+### Enhanced Type Inference System
+
+The type inference engine has been completely rewritten to provide more accurate and comprehensive type resolution. The new system performs bidirectional type checking during constraint resolution, significantly reducing the need for explicit annotations while catching more type errors at compile time. This improvement is particularly beneficial for code using generics and higher-order functions.
+
+```brush
+// Before 1.2:
+let map = fn<T, U>(array: Array<T>, mapper: fn(T) -> U) -> Array<U> { ... }
+let result = map<int, string>(numbers, fn(n: int) -> string { return n.toString(); });
+
+// Now in 1.2:
+let result = map(numbers, fn(n) { return n.toString(); });
+// Types are fully inferred: map<int, string>(Array<int>, fn(int) -> string) -> Array<string>
+```
+
+### Cross-Platform Module System
+
+Version 1.2 brings a unified module system that works consistently across all supported platforms. Modules can now specify conditional exports based on platform, allowing for platform-specific implementations while maintaining a consistent API. The new `brush.import()` function supports dynamic imports with proper error handling and lifecycle management.
+
+### Pattern Matching Expressions
+
+Pattern matching has been expanded with the introduction of the `match` expression, supporting destructuring, type patterns, and guard clauses. The compiler optimizes match expressions into efficient jump tables where possible, providing performance comparable to hand-written conditional logic.
+
+### Interactive Debugging Protocol
+
+The Brush runtime now includes a standardized debugging protocol that integrates with major IDEs and editor extensions. Developers can set breakpoints, inspect variables, and step through code execution with comprehensive type information and runtime state visualization. The protocol is documented in `docs/tools/debugging-protocol.md`.
+
+## Breaking Changes
+
+⚠️ **String Literal Handling**: String literals are now immutable by default to enable compiler optimizations. Use the new `mutable` keyword to create mutable strings: `let s = mutable "Hello";`
+
+⚠️ **Lambda Expression Syntax**: Anonymous functions with a single expression no longer require the `return` keyword. This may affect code that used expression statements with side effects as the final statement.
+
+⚠️ **Runtime Library Path**: The standard library location has changed on Unix-like systems from `/usr/lib/brush/1.1` to `/usr/lib/brush/lib`. Existing build scripts may need to be updated.
+
+## Bug Fixes
+
+Version 1.2 resolves over 47 reported issues, including critical fixes for memory management, concurrency edge cases, and compiler correctness. Particular attention was paid to error handling in cross-language interoperability. For a complete list of fixes, see CHANGELOG_1.2.md.
+
+## Performance Improvements
+
+- Compilation speed has increased by 35% on average through improved incremental compilation and parallel type checking.
+- Runtime memory usage is reduced by approximately 22% due to optimized object representation and more efficient garbage collection.
+- String operations are now 40-60% faster with the new immutable-by-default string implementation.
+- The binary size of compiled applications has decreased by 18% through improved code generation and dead code elimination.
+
+## Deprecation Notices
+
+The following features are deprecated in Brush 1.2 and will be removed in version 1.3:
+
+- The `brush.sync()` function is deprecated in favor of the new async/await syntax.
+- Legacy format string syntax using `%` is deprecated. Use string interpolation with backticks instead.
+- The `--old-gc` command-line option is deprecated as the new garbage collector is now stable.
+- The `TypedArray` constructor without explicit sizing is deprecated for performance reasons.
+
+## Installation & Upgrade
+
+Brush 1.2 is compatible with 1.1.x modules but requires recompilation for optimal performance. Existing Brush 1.1 code should compile with minimal changes unless it relies on behavior modified by the breaking changes listed above.
+
+To upgrade from Brush 1.1, run:
+
+```bash
+brush-package update --version 1.2.0
+brush-migrate --from 1.1 --to 1.2 --project-path ./your-project
+```
+
+The migration tool will identify and suggest fixes for code affected by breaking changes. For manual migration guidance, see `docs/migration/1.1-to-1.2.md`.
+
+## Dependencies
+
+- Requires LLVM 16.0+ for compiler toolchain
+- Compatible with GCC 12+ and Clang 15+
+- On Windows, requires Visual Studio 2022 with C++20 support
+- Minimum runtime dependencies: libc 2.35, libm 2.35
+- For optional GPU acceleration: CUDA 11.4 or OpenCL 3.0
+
+## Platform Support
+
+Brush 1.2 adds official support for:
+- ARM64 architectures (Apple Silicon, AWS Graviton)
+- FreeBSD 13.0+
+- WebAssembly (via browser and Node.js targets)
+
+For a complete list of supported platforms and minimum requirements, see `docs/platform-support.md`.
+
+---
+
+# CHANGELOG_1.2.md
+
+## [1.2.0] - 2025-02-08
+
+### Added
+
+- Added async/await functionality with new keywords and runtime support. Async functions can be created using `async fn` syntax and awaited with the `await` operator. ([BRH-145])
+- Implemented new pattern matching expressions with the `match` keyword, supporting type patterns, destructuring, and guard clauses (#1894)
+- Added cross-platform module system with conditional exports and dynamic imports. The runtime now correctly handles circular dependencies and provides detailed error messages for import failures. (BRH-203)
+- Add improved debugging protocol for IDE integration (VSCode, JetBrains). Protocol specification available at docs/tools/debugging-protocol.md
+
+### Changed
+
+- Updated string literals to be immutable by default for performance optimization. To preserve backwards compatibility, the compiler will warn when mutation is attempted on string literals (BRH-302)
+- Changed lambda expression syntax to make the `return` keyword optional for single expression functions. Thanks to Emily Johnson for the implementation work.
+- Modify standard library path on Unix systems from `/usr/lib/brush/1.1` to `/usr/lib/brush/lib` for better versioning support
+- Refactored type inference system to perform bidirectional type checking during constraint resolution phase. This reduces the need for explicit type annotations by 78% in the standard library. (#1840)
+- Update error messages for type mismatch to include suggested fixes and relevant documentation links. Error E0308 now provides specific guidance on type conversion. (fixes #1922)
+
+### Fixed
+
+- Fixed memory leak in concurrent object allocation when garbage collection triggers during object initialization. This issue caused gradual memory consumption in long-running server applications. (BRH-290)
+- Fix incorrect type inference with nested generic functions that was causing "ambiguous type variable" errors. Reported by Alex Chen <a.chen@dataworks.io>
+- Resolved SEGFAULT_0x7f in the interpreter when evaluating deeply nested expressions with more than 2048 levels of nesting. (#1932)
+- Fixed compiler crash when using pattern matching on tuple types with more than 12 elements at brush.compiler.patterns:354. Thanks to Robin Williams for discovering this issue.
+- Fix bug where string interpolation inside async functions could access deallocated memory when awaiting between interpolation segments. Reported by Mark Thompson <m.thompson@cloudarch.com>
+- Fixed incorrect line numbers in stack traces for multi-line expressions. Stack traces now correctly point to the expression's starting line. (fixes #1876)
+- Resolved race condition in parallel type checker that occasionally produced inconsistent errors for valid code when using incremental compilation. (#1901)
+
+### Performance
+
+- Improved compilation speed by 35% through parallel type checking and more efficient AST traversal. Large projects compile significantly faster, especially on multi-core systems.
+- Reduced memory consumption of the runtime by approximately 22% by optimizing object representation and implementing more efficient garbage collection in gc_collect(). (#1847)
+- String operations are now 40-60% faster due to the new immutable-by-default string implementation and optimized string buffer management. ([BRH-255])
+- Performance improvement for integer division operations on ARM64 platforms - now uses native instructions instead of libm calls. (23% speedup on M2 processors)
+
+### Security
+
+- Patched integer overflow vulnerability in Array.resize() that could lead to memory corruption (CVE-2025-4872). Reported by Security Research Team at SecureTech.
+- Fixed potential information disclosure when using FFI with C libraries that could expose memory contents through uninitialized padding bytes. ([BRH-308])
+- Address potential timing attack in the secure string comparison functions by implementing constant-time comparison algorithms. (#1905)
+
+### Deprecated
+
+- The brush.sync() function is now deprecated in favor of the new async/await syntax
+- Legacy format string syntax using '%' is deprecated and will be removed in version 1.3. Use string interpolation with backticks instead
+- Deprecated --old-gc command line option as the new garbage collector is now stable
+- TypedArray constructor without explicit sizing is deprecated for performance reasons (BRH-287)
+
+### Documentation
+
+- Updated async programming guide with comprehensive examples and best practices (docs/async-await.md)
+- Fix incorrect examples in the pattern matching documentation that showed outdated syntax from the beta implementation. Reported by Chris Martin.
+- Completely rewrote performance tuning guide with new profiling tools and optimization techniques. (docs/performance/optimization.md)
+- Update FFI documentation to clarify memory management responsibility when interfacing with C libraries

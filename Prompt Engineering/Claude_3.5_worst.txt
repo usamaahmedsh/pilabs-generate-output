@@ -1,0 +1,90 @@
+# Brush Programming Language
+
+Version 1.2.0 (September 15, 2023)
+
+## Overview
+
+Brush is a modern, expressive programming language designed for creative coding, data visualization, and rapid application development. It combines the simplicity of scripting languages with powerful functional programming paradigms and a flexible type system.
+
+## System Requirements
+
+- 64-bit operating system (Windows 10+, macOS 10.14+, or Linux with glibc 2.28+)
+- 4GB RAM minimum, 8GB recommended
+- 500MB disk space for full installation
+- GPU with OpenGL 4.3+ support for graphics acceleration
+
+## Key Features
+
+- First-class functions with closures and partial application
+- Pattern matching and destructuring
+- Gradual typing with type inference
+- Built-in concurrency model using async/await and channels
+- Native canvas and WebGL rendering capabilities
+- Hot code reloading for interactive development
+- Comprehensive standard library with data manipulation tools
+- Package manager (brush-pm) with dependency resolution
+
+## Installation
+
+```bash
+# Linux/macOS
+curl -sSL https://brush-lang.org/install.sh | sh
+
+# Windows
+iwr -useb https://brush-lang.org/install.ps1 | iex
+```
+
+## Breaking Changes in 1.2
+
+- The `draw()` function now uses the new rendering pipeline by default
+- Deprecated `oldCanvas` API has been removed
+- Type parameters now require explicit variance annotations
+- Changed error handling in async contexts to use Result type
+
+## Known Issues
+
+- Memory usage may spike during complex pattern matching operations
+- WebGL interoperability is still experimental on ARM architectures
+- Some IDE integrations may show false positive type errors
+
+## License
+
+Brush is released under the MIT License.
+Copyright © 2021-2023 The Brush Language Team
+
+---
+
+# Changelog for Brush 1.2.0
+
+## Added
+- New reactive programming primitives (`Signal`, `Computed`, `Effect`)
+- WebGPU backend for rendering pipeline with feature flag `--enable-webgpu`
+- Support for custom operators with user-defined precedence
+- Added `try` expression for more ergonomic error handling
+- New standard library modules: `brush.crypto`, `brush.net.http2`
+- Tail call optimization for self-recursive functions
+- Native ARM64 support for Apple Silicon
+
+## Changed
+- Improved type inference algorithm with 30% better performance
+- Redesigned rendering pipeline with hardware acceleration
+- Enhanced pattern matching to support nested patterns
+- Reduced memory footprint of string operations by ~40%
+- Updated bundled dependencies to latest versions
+- Improved error messages with contextual hints
+
+## Fixed
+- Fixed memory leak in channel operations (#1432)
+- Fixed race condition in async event loop (#1489)
+- Corrected type inference for higher-rank polymorphic functions (#1503)
+- Fixed parser bug with nested template literals (#1521)
+- Resolved crash when using large integer literals on 32-bit systems (#1536)
+- Fixed incorrect code generation for certain closure patterns (#1542)
+
+## Deprecated
+- The `brush.oldrender` module is now deprecated and will be removed in 1.3
+- Legacy event system is deprecated in favor of new reactive primitives
+
+## Security
+- Fixed potential buffer overflow in native extension loading (CVE-2023-28756)
+- Updated TLS implementation to address potential vulnerabilities

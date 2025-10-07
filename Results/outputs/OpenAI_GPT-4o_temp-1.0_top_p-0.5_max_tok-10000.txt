@@ -1,0 +1,100 @@
+```markdown
+# Brush Language - Version 1.2.0 Release Notes
+Released: January 15, 2025
+
+## Overview
+
+Version 1.2 of the Brush programming language brings a host of new features, performance enhancements, and critical bug fixes to improve developer experience and runtime efficiency. This release focuses on expanding the language's capabilities while maintaining backward compatibility with previous versions. Developers can now leverage advanced features like enhanced async handling and improved type inference to write more efficient and expressive code.
+
+We're excited to introduce several major updates that streamline code execution and reduce runtime overhead. These improvements, along with various bug fixes and optimizations, make Brush 1.2 a robust and reliable choice for both new and existing projects.
+
+For a complete list of fixes and changes, please refer to the [CHANGELOG_1.2.md](CHANGELOG_1.2.md).
+
+## Highlights
+
+### Enhanced Async Handling
+
+Brush 1.2 introduces the `brush.async.timeout(duration: int, callback: fn)` function, allowing developers to set timeouts for asynchronous operations. This feature works by wrapping the callback in a timeout handler, ensuring operations do not exceed specified durations. This is particularly useful in network programming where response times are unpredictable.
+
+```brush
+brush.async.timeout(5000, fn() {
+    println("Operation timed out");
+});
+```
+
+### Improved Type Inference System
+
+The type inference system has been significantly enhanced, reducing the need for explicit type annotations. The compiler now performs bidirectional type checking during constraint resolution, enabling it to infer complex generic types from context. This improvement is especially beneficial in functional programming patterns involving higher-order functions and closures.
+
+### String Interpolation Optimization
+
+String interpolation has been optimized, resulting in a 23% performance boost for strings with 10 or more variables. This is achieved by precomputing variable positions and caching them during the first pass of the parser. This change reduces the runtime overhead associated with dynamic string construction.
+
+### Memory Management Enhancements
+
+The garbage collector has been improved to handle concurrent object allocations more efficiently. This enhancement reduces the likelihood of SEGFAULTs during high-load scenarios, providing a more stable runtime environment.
+
+## Breaking Changes
+
+⚠️ **String Encoding Change**: The default string encoding has changed from UTF-8 to UTF-16 for Windows compatibility. Existing code that relies on byte-level string operations may need adjustment. See migration guide in `docs/migration/1.1-to-1.2.md`.
+
+## Bug Fixes
+
+This release addresses several critical bugs, improving the overall stability and reliability of the language. For detailed information on specific fixes, see the [CHANGELOG_1.2.md](CHANGELOG_1.2.md).
+
+## Performance Improvements
+
+Version 1.2 delivers a 15% reduction in compile time and a 40% smaller binary size for typical applications. These optimizations are achieved through improvements in the code generation phase and more efficient use of memory during compilation.
+
+## Deprecation Notices
+
+The `old_callback_style()` function is deprecated and will be removed in version 1.3. Developers are encouraged to transition to the new async/await syntax for improved readability and performance.
+
+## Installation & Upgrade
+
+Developers upgrading from 1.1.x should note the changes in string encoding and adjust their code accordingly. The upgrade process is straightforward, with most existing codebases requiring minimal changes.
+
+## Dependencies
+
+Brush 1.2 requires LLVM 15.0+ and is compatible with GCC 11+. Ensure your development environment meets these requirements before upgrading.
+
+---
+
+```markdown
+## [1.2.0] - 2025-01-15
+
+### Added
+
+- Introduced `brush.async.timeout(duration: int, callback: fn)` for setting timeouts on async operations. This feature helps prevent indefinite blocking in asynchronous code. (#1840)
+- Added support for UTF-16 string encoding on Windows platforms to improve compatibility with native APIs. [BRH-302]
+
+### Changed
+
+- Updated type inference system to perform bidirectional type checking, reducing the need for explicit type annotations in generic functions. This change enhances the expressiveness of functional programming patterns. (fixes #1891)
+- Modified string interpolation mechanism to precompute variable positions, resulting in a 23% performance improvement for complex strings. (#2301)
+
+### Fixed
+
+- Fixed compiler crash when using nested lambda expressions with closure capture. The issue occurred in `eval_context()` when scope resolution failed for shadowed variables. (fixes #1847)
+- Resolved SEGFAULT in garbage collector during concurrent object allocation. Reported by Emma Rodriguez <e.rodriguez@techcorp.io>
+- Addressed memory leak in `gc_collect()` that occurred during high-frequency allocation and deallocation cycles. The leak was traced to an improper reference count decrement. (fixes #1920)
+- Corrected error code E0308 in type checker when inferring types for chained method calls. Thanks to Mike Torres for reporting.
+
+### Security
+
+- Patched vulnerability in `stdlib/io.brush` where untrusted input could lead to arbitrary code execution. The input is now properly sanitized before processing. (fixes #203)
+
+### Deprecated
+
+- Deprecated `old_callback_style()` in favor of the new async/await syntax. This function will be removed in version 1.3. Developers should update their code to use the modern syntax.
+
+### Performance
+
+- Improved compile time by 15% through optimization of the code generation phase. This enhancement reduces the time required to build large projects. (#1845)
+- Reduced runtime footprint from 8MB to 5.2MB by optimizing memory usage during execution. This change benefits applications with limited resources.
+
+### Documentation
+
+- Updated documentation for async/await syntax, previous examples was using deprecated callback style. (fixes #1850)
+- Clarified usage of `Token.IDENTIFIER` in lexer documentation, addressing confusion about its role in the parsing process. Reported by John Smith <jsmith@email.com>
+```

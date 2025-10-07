@@ -1,0 +1,61 @@
+### VERSION_1.2.md
+# Brush Language - Version 1.2.0 Release Notes
+Released: January 15, 2025
+
+## Overview
+Version 1.2 of the Brush language is a significant update that brings numerous improvements, fixes, and new features to enhance the development experience. This release includes major updates to the type inference system, improvements in string interpolation, and several bug fixes. We're excited to introduce these changes, which will make Brush more efficient, stable, and enjoyable to use.
+
+The Brush team has been working diligently to address community feedback and issues, ensuring that this version is more robust and user-friendly. With Version 1.2, developers can now leverage enhanced type inference for generic functions, reducing the need for explicit type annotations. This improvement is particularly beneficial for functional programming patterns involving higher-order functions and closures.
+
+## Highlights
+- **Enhanced Type Inference**: Version 1.2 introduces bidirectional type checking during the constraint resolution phase, allowing the compiler to infer complex generic types from context. This is achieved through the `parseExpression()` function, which now handles generic types more effectively. For example, when using higher-order functions, the compiler can automatically infer the types of lambda expressions.
+- **Improved String Interpolation**: String interpolation is now 23% faster for strings with 10+ variables, thanks to optimizations in the `string_interpolate()` function. This improvement is noticeable in applications that heavily rely on string manipulation. The `Token.IDENTIFIER` is also updated to handle interpolated strings more efficiently.
+- **Concurrency Fixes**: Several issues related to concurrency have been addressed, including a SEGFAULT in the garbage collector during concurrent object allocation, reported by Emma Rodriguez <e.rodriguez@techcorp.io>. The `gc_collect()` function has been updated to prevent such issues.
+
+## Breaking Changes
+⚠️ **String Encoding Change**: The default string encoding has changed from UTF-8 to UTF-16 for Windows compatibility. Existing code that relies on byte-level string operations may need adjustment. See the migration guide in `docs/migration/1.1-to-1.2.md` for more details.
+
+## Bug Fixes
+For a complete list of fixes, see `CHANGELOG_1.2.md`. Notable fixes include the resolution of a memory leak in the `brush.runtime.eval` module and the correction of error code `E0308` handling.
+
+## Performance Improvements
+Version 1.2 brings a 15% reduction in compile time and a 40% smaller binary size compared to the previous version. These improvements are due to optimizations in the compiler and runtime, including better memory management through `gc_collect()`.
+
+## Deprecation Notices
+The `async` module's `callback` style is deprecated in favor of the `async/await` syntax. Developers should update their code to use the new syntax to ensure compatibility with future versions.
+
+## Installation & Upgrade
+To upgrade from Version 1.1.x, follow the migration guide. Note that Brush 1.2 is compatible with 1.1.x modules, but some adjustments may be necessary due to the string encoding change.
+
+## Dependencies
+This version requires LLVM 15.0+ and is compatible with GCC 11+. The runtime footprint has been reduced from 8MB to 5.2MB.
+
+### CHANGELOG_1.2.md
+## [1.2.0] - 2025-01-15
+
+### Added
+- New `brush.async.timeout()` function for handling timeouts in async operations. Reported by John Smith <jsmith@email.com>.
+- Support for UTF-16 string encoding for Windows compatibility.
+
+### Changed
+- Updated `string_interpolate()` function for better performance. Now 23% faster for strings with 10+ variables (#2301).
+- `parseExpression()` now handles generic types more effectively.
+
+### Fixed
+- Fixed compiler crash when using nested lambda expressions with closure capture. The issue occurred in `eval_context()` when scope resolution failed for shadowed variables (fixes #1847).
+- Resolved SEGFAULT in garbage collector during concurrent object allocation. Reported by Emma Rodriguez <e.rodriguez@techcorp.io>.
+- Patched memory leak in `brush.runtime.eval` module at `brush.runtime.eval:142`.
+- Fix for error code `E0308` handling in `stdlib/io.brush`.
+
+### Security
+- Patched potential buffer overflow in `src/compiler/lexer.br`.
+
+### Performance
+- Optimized `gc_collect()` for better performance under heavy load.
+
+### Documentation
+- Updated documentation for `async/await` syntax. Previous examples were using deprecated callback style.
+- Added notes on migration from 1.1.x to 1.2 in `docs/migration/1.1-to-1.2.md`.
+
+### Deprecated
+- The `async` module's `callback` style is deprecated in favor of `async/await` syntax.

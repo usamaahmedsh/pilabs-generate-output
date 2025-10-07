@@ -1,0 +1,156 @@
+# VERSION_1.2.md
+
+# Brush Language - Version 1.2.0 Release Notes
+
+Released: March 22, 2025
+
+## Overview
+
+Brush 1.2.0 represents a significant milestone in the language's evolution, focusing on performance optimization, developer ergonomics, and ecosystem stability. This release introduces several key enhancements to the type system, adds powerful new concurrency primitives, and delivers substantial improvements to the compiler infrastructure.
+
+We're excited to introduce the new async/await syntax, which dramatically simplifies asynchronous programming patterns while maintaining Brush's commitment to predictable performance characteristics. Additionally, version 1.2 brings a comprehensive overhaul of the standard library's collection types, providing more consistent interfaces and improved memory efficiency.
+
+## Highlights
+
+### Async/Await Syntax
+
+Brush now supports first-class async/await syntax for elegant asynchronous programming without callback hell. The implementation leverages a zero-cost abstraction model that compiles to state machines rather than heap allocations. This approach maintains performance parity with manual callback implementations while significantly improving code readability.
+
+```brush
+async fn fetch_data(url: String) -> Result<Data, Error> {
+    let response = await http.get(url)?;
+    let data = await response.parse::<Data>()?;
+    return Ok(data);
+}
+```
+
+### Enhanced Type Inference
+
+Version 1.2 introduces enhanced type inference for generic functions, significantly reducing the need for explicit type annotations. The compiler now performs bidirectional type checking during the constraint resolution phase, allowing it to infer complex generic types from context. This improvement is particularly noticeable in functional programming patterns involving higher-order functions and closures.
+
+```brush
+// Before 1.2:
+let result = map<int, string>(values, fn<int, string>(x) => x.to_string());
+
+// Now in 1.2:
+let result = map(values, fn(x) => x.to_string());
+```
+
+### Pattern Matching Enhancements
+
+Pattern matching has been extended with destructuring assignments and guard clauses, enabling more expressive and concise code. The compiler now optimizes pattern matching into efficient jump tables when appropriate, resulting in performance comparable to manual switch statements. These improvements make pattern matching a zero-cost abstraction for most use cases.
+
+### Improved Error Messages
+
+Compiler error messages have been completely redesigned to provide more context, suggested fixes, and relevant documentation links. Error spans now precisely highlight the problematic code regions with multi-line annotations. The new diagnostic engine can detect common mistakes and offer targeted suggestions based on static analysis of surrounding code.
+
+### Standard Library Enhancements
+
+The standard library has been expanded with new modules for time handling, file system operations, and cryptographic primitives. The collections module now provides consistent interfaces across all container types, with specialized implementations for common use cases. Memory usage for standard containers has been reduced by up to 30% through layout optimizations.
+
+## Breaking Changes
+
+⚠️ **String Encoding Change**: The default string encoding has changed from UTF-8 to UTF-16 for Windows compatibility. Existing code that relies on byte-level string operations may need adjustment. See migration guide in docs/migration/1.1-to-1.2.md.
+
+⚠️ **Collection API Refactoring**: Several collection methods have been renamed for consistency. The old method names are deprecated but still available in this release. They will be removed in version 1.3. See the deprecation notices below for details.
+
+## Bug Fixes
+
+Version 1.2 addresses 37 reported bugs, including critical fixes for memory leaks in the garbage collector, parser recovery issues, and type inference edge cases. Notable improvements include resolution of the long-standing issue with closure capture in nested lambdas and fixes for several concurrency-related race conditions.
+
+For a complete list of fixes, see CHANGELOG_1.2.md or issues #1840-#1891 in the issue tracker.
+
+## Performance Improvements
+
+- **Compiler Speed**: Overall compilation time reduced by 18% through improved incremental compilation and parallel type checking.
+- **Runtime Performance**: Function dispatch overhead reduced by 25% via enhanced inlining heuristics and call-site specialization.
+- **Memory Usage**: Runtime footprint reduced from 8.4MB to 5.7MB through more efficient data structures and improved garbage collection.
+- **Binary Size**: Optimized code generation results in 12% smaller executables on average.
+
+## Deprecation Notices
+
+The following APIs are deprecated in 1.2 and will be removed in version 1.3:
+
+- `List.push()` is deprecated in favor of `List.append()` for consistency with other collection types.
+- `Map.contains_key()` is deprecated in favor of `Map.has()` for brevity and consistency.
+- The `brush.util.format()` function is deprecated in favor of string interpolation syntax.
+- Legacy callback-style async functions are deprecated in favor of the new async/await syntax.
+
+## Installation & Upgrade
+
+Brush 1.2 is compatible with 1.1.x modules but requires recompilation for optimal performance. Developers upgrading from 1.1.x should note the breaking changes mentioned above, particularly regarding string encoding and collection APIs.
+
+To upgrade:
+```bash
+brush package upgrade --version 1.2.0
+brush build --clean
+```
+
+## Dependencies
+
+- Requires LLVM 16.0+ for optimal code generation
+- Compatible with GCC 12+ and Clang 14+
+- Runtime now depends on libuv 1.44.2 for cross-platform async I/O
+- Windows builds require Visual Studio 2022 or newer
+
+---
+
+# CHANGELOG_1.2.md
+
+## [1.2.0] - 2025-03-22
+
+### Added
+
+- Added async/await syntax for simplified asynchronous programming. The implementation uses zero-cost abstractions that compile to state machines. (#1842)
+
+- Implemented enhanced pattern matching with destructuring assignments and guard clauses. Pattern matching now optimizes to efficient jump tables when appropriate. (BRH-291)
+
+- Added new `Time` module to standard library with timezone-aware datetime handling. Thanks to Priya Sharma <p.sharma@chronosystems.net> for the implementation.
+
+- Introduced experimental WebAssembly target support. Compile with `brush build --target wasm32` to generate .wasm files. (BRH-187)
+
+### Changed
+
+- Update string encoding from UTF-8 to UTF-16 for better Windows compatibility. ⚠️ This is a breaking change for code that relies on byte-level string operations. (#1856)
+
+- Refactored collection APIs for consistency across container types. Old method names are deprecated but still available in this release. [BRH-302]
+
+- Enhanced type inference system to better handle generic functions and reduce the need for explicit type annotations. The compiler now performs bidirectional type checking during constraint resolution. (#1863)
+
+- Improved error messages with more context, suggested fixes, and documentation links. Error spans now precisely highlight problematic code regions. (BRH-245)
+
+### Fixed
+
+- Fixed compiler crash when using nested lambda expressions with closure capture. The issue occurred in `eval_context()` when scope resolution failed for shadowed variables. (fixes #1847)
+
+- Resolved SEGFAULT in garbage collector during concurrent object allocation at brush.runtime.gc_collect:142. Reported by Emma Rodriguez <e.rodriguez@techcorp.io>
+
+- Fix race condition in async task scheduler that could cause deadlocks under high load. The scheduler now properly handles task cancellation and timeout edge cases. (#1872)
+
+- Patched memory leak in the `FileStream` implementation when exceptions were thrown during write operations. (ERR_RESOURCE_LEAK_0x4F)
+
+- Fixed incorrect type inference for tuple destructuring in lambda parameters. The issue caused E0308 type mismatch errors in valid code. Reported by Alex Johnson.
+
+- Resolved parser recovery issues when encountering syntax errors in multi-line expressions. The parser now correctly resynchronizes at statement boundaries. (BRH-312)
+
+### Performance
+
+- Improved compilation speed by 18% through enhanced incremental compilation and parallel type checking. (#1881)
+
+- Optimized function dispatch overhead by 25% via improved inlining heuristics and call-site specialization. This particularly benefits code with heavy use of higher-order functions.
+
+- Reduced runtime memory footprint from 8.4MB to 5.7MB through more efficient data structures in src/runtime/memory.br. [BRH-298]
+
+- Performance improvement in string interpolation - now 23% faster for strings with 10+ variables. Fixed by Sarah Chen <s.chen@brushlang.org> (#2301)
+
+### Security
+
+- Fixed potential buffer overflow in `parseExpression()` when handling deeply nested expressions. The parser now enforces reasonable depth limits. (CVE-2025-1234)
+
+- Addressed integer overflow vulnerability in `Array.resize()` that could lead to memory corruption. Reported by Security Team at CodeGuardian.
+
+### Documentation
+
+- Update documentation for async/await syntax, previous examples was using deprecated callback style
+
+- Expanded standard library documentation with more examples and best practices. All stdlib functions now include complexity analysis and memory characteristics.

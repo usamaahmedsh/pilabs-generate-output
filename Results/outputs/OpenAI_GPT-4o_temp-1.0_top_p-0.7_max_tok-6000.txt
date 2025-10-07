@@ -1,0 +1,105 @@
+```markdown
+# Brush Language - Version 1.2.0 Release Notes
+
+Released: January 15, 2025
+
+## Overview
+
+Version 1.2 of the Brush programming language brings a host of new features, improvements, and bug fixes designed to enhance the developer experience and increase performance. This release focuses on expanding the language's capabilities while maintaining backward compatibility with version 1.1.x modules. Developers can now take advantage of new language constructs and improved tooling, making Brush an even more powerful tool for modern software development.
+
+We're excited to introduce several major enhancements, including a new asynchronous programming model and a revamped garbage collector, which provide greater efficiency and control. Additionally, a range of performance optimizations has been implemented, significantly reducing compile times and runtime memory usage.
+
+For a complete list of fixes and updates, please refer to the accompanying [CHANGELOG_1.2.md](CHANGELOG_1.2.md).
+
+## Highlights
+
+### Asynchronous Programming Model
+
+Brush 1.2 introduces a new asynchronous programming model, allowing developers to write non-blocking code using `async` and `await` keywords. The `brush.async.timeout(duration: int, callback: fn)` function enables precise control over asynchronous operations, making it easier to handle concurrent tasks. This feature is particularly beneficial for I/O-bound applications, improving responsiveness and throughput.
+
+```brush
+async function fetchData(url: string): string {
+    let data = await http.get(url);
+    return data;
+}
+```
+
+### Enhanced Garbage Collector
+
+The garbage collector has been significantly improved to reduce latency and memory footprint. It now employs a generational collection strategy, which optimizes memory usage by segregating short-lived and long-lived objects. This results in a 25% reduction in pause times during garbage collection cycles, enhancing application performance, especially in memory-intensive scenarios.
+
+### Improved Type Inference System
+
+Version 1.2 enhances type inference for generic functions, reducing the need for explicit type annotations. The compiler performs bidirectional type checking during constraint resolution, allowing it to infer complex generic types from context. This improvement is particularly noticeable in functional programming patterns involving higher-order functions and closures.
+
+## Breaking Changes
+
+⚠️ **String Encoding Change**: The default string encoding has changed from UTF-8 to UTF-16 for Windows compatibility. Existing code that relies on byte-level string operations may need adjustment. See the migration guide in `docs/migration/1.1-to-1.2.md`.
+
+## Bug Fixes
+
+This release addresses several critical bugs, improving stability and reliability. For a detailed list of bug fixes, see [CHANGELOG_1.2.md](CHANGELOG_1.2.md).
+
+## Performance Improvements
+
+Brush 1.2 delivers significant performance enhancements, including a 15% reduction in compile time and a 40% smaller binary size for typical applications. These improvements stem from optimizations in the lexer and parser stages, as well as more efficient code generation.
+
+## Deprecation Notices
+
+Certain features are deprecated in this release and will be removed in future versions. Developers are encouraged to transition away from deprecated features as soon as possible. Details can be found in the deprecation section of the [CHANGELOG_1.2.md](CHANGELOG_1.2.md).
+
+## Installation & Upgrade
+
+To upgrade to Brush 1.2, ensure your environment meets the new dependencies: Requires LLVM 15.0+ and is compatible with GCC 11+. Follow the installation instructions in the `docs/install.md` for a smooth transition.
+
+## Dependencies
+
+This release updates several core library dependencies to their latest versions, ensuring compatibility and leveraging new features. Notably, the standard library now includes enhanced I/O capabilities and expanded math functions.
+
+---
+
+# CHANGELOG_1.2.md
+
+## [1.2.0] - 2025-01-15
+
+### Added
+
+- Introduced new `async` and `await` keywords for asynchronous programming. Enables non-blocking I/O operations and simplifies concurrency handling. (See #1842)
+
+- Added support for native JSON parsing with `parseJson()` function. This improves data interchange capabilities and integrates seamlessly with existing Brush data structures. (#1883)
+
+### Changed
+
+- Modified garbage collector to use a generational approach, reducing latency. Memory management is now more efficient, especially for applications with large heaps. (Reported by John Smith <jsmith@email.com>)
+
+- Updated the lexer to improve token recognition accuracy. This change affects `Token.IDENTIFIER` parsing, resolving issues with misclassification in complex expressions. (fixes #1905)
+
+### Fixed
+
+- Fixed issue with `parseExpression()` function causing incorrect type inference. Error code E0308 was triggered in certain nested expression scenarios. (Thanks to Mike Torres for reporting)
+
+- Resolved SEGFAULT_0x7f in garbage collector during concurrent object allocation. Occurred in `gc_collect()` under high load conditions. (Reported by Emma Rodriguez <e.rodriguez@techcorp.io>)
+
+- Patched memory leak in `eval_context()` when handling large closures. Memory usage now stabilizes during prolonged runtime operations. (fixes #203)
+
+### Security
+
+- Patched vulnerability in stdlib/io.brush related to file descriptor leakage. Ensures file handles are correctly closed after I/O operations, preventing resource exhaustion. (BRH-302)
+
+### Deprecated
+
+- Deprecated old callback-based async model in favor of new `async`/`await` syntax. Will be removed in version 1.3.0, developers should update their code accordingly.
+
+### Performance
+
+- Performance improvement in string interpolation - now 23% faster for strings with 10+ variables. This optimization reduces the overhead in `formatString()` function. (#2301)
+
+### Documentation
+
+- Updated documentation for async/await syntax. Previous examples was using deprecated callback style, now replaced with modern async patterns.
+
+### Miscellaneous
+
+- Corrected minor typos in standard library comments. Ensures better readability and understanding of code intentions.
+
+```

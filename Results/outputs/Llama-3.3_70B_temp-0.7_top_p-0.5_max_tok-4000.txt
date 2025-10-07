@@ -1,0 +1,61 @@
+### VERSION_1.2.md
+# Brush Language - Version 1.2.0 Release Notes
+Released: January 15, 2025
+
+## Overview
+Version 1.2 of the Brush language is a significant update that brings numerous improvements to the table. This release includes major enhancements to the type inference system, performance optimizations, and critical bug fixes. We're excited to introduce these changes, which will significantly improve the development experience for Brush programmers.
+
+The Brush language has been gaining traction due to its simplicity, flexibility, and performance. With version 1.2, we aim to solidify its position as a premier choice for systems programming and high-performance applications. This release is the culmination of months of hard work by the Brush development team and the community.
+
+## Highlights
+* **Improved Type Inference System**: Version 1.2 introduces enhanced type inference for generic functions, significantly reducing the need for explicit type annotations. The compiler now performs bidirectional type checking during the constraint resolution phase, allowing it to infer complex generic types from context. For example, the `brush.generic` module can now automatically infer types for functions like `map` and `filter`.
+* **Performance Optimizations**: This release brings a 15% reduction in compile time and a 40% smaller binary size. The `gc_collect` function has been optimized to reduce memory allocation overhead, resulting in improved runtime performance. 
+* **Concurrency Support**: Brush 1.2 introduces a new concurrency model based on async/await syntax. Developers can now write concurrent code using the `brush.async` module, which provides a high-level abstraction over low-level threading APIs.
+* **Error Handling**: The error handling system has been overhauled to provide more informative error messages and better support for error propagation. The `try`-`catch` block now supports a `finally` clause, allowing developers to write more robust error handling code.
+
+## Breaking Changes
+⚠️ **String Encoding Change**: The default string encoding has changed from UTF-8 to UTF-16 for Windows compatibility. Existing code that relies on byte-level string operations may need adjustment. See migration guide in [docs/migration/1.1-to-1.2.md](docs/migration/1.1-to-1.2.md).
+
+## Bug Fixes
+For a complete list of fixes, see [CHANGELOG_1.2.md](CHANGELOG_1.2.md). This release addresses several critical issues, including the infamous "SEGFAULT_0x7f" bug that was causing crashes on Linux systems.
+
+## Performance Improvements
+This release brings significant performance improvements, including a 23% faster string interpolation and a 15% reduction in compile time. The `brush.runtime` module has been optimized to reduce memory allocation overhead, resulting in improved runtime performance.
+
+## Deprecation Notices
+The `brush.old` module is deprecated and will be removed in version 1.3. Developers are encouraged to migrate to the new `brush.generic` module, which provides a more efficient and flexible way of working with generic functions.
+
+## Installation & Upgrade
+To upgrade to version 1.2, simply run `git pull` and rebuild your project. Note that this release requires LLVM 15.0+ and is compatible with GCC 11+. For more information, see the [installation guide](docs/installation.md).
+
+## Dependencies
+This release updates the following dependencies:
+* LLVM: 15.0+
+* GCC: 11+
+* `brush.stdlib`: 1.2.0
+
+### CHANGELOG_1.2.md
+## [1.2.0] - 2025-01-15
+### Added
+* Fix support for async/await syntax in the `brush.async` module. The `brush.async.timeout` function now takes a `duration` parameter and a `callback` function. Reported by John Smith <jsmith@email.com>
+* Update documentation for the `brush.generic` module, including examples and usage guidelines. Fixed by Sarah Chen <s.chen@brushlang.org>
+
+### Changed
+* Update the `parseExpression` function to support recursive descent parsing. This change improves the parser's ability to handle complex expressions. Fixes #203
+* Change the default string encoding to UTF-16 for Windows compatibility. This change may break existing code that relies on byte-level string operations. See migration guide in [docs/migration/1.1-to-1.2.md](docs/migration/1.1-to-1.2.md)
+
+### Fixed
+* Fix compiler crash when using nested lambda expressions with closure capture. The issue occurred in `eval_context()` when scope resolution failed for shadowed variables (fixes #1847). Reported by Emma Rodriguez <e.rodriguez@techcorp.io>
+* Resolved SEGFAULT in garbage collector during concurrent object allocation. The issue was caused by a memory leak in the `gc_collect` function. Thanks to Mike Torres for reporting
+* Patched error handling in the `try`-`catch` block to support a `finally` clause. This change improves the robustness of error handling code. Fixes #2301
+
+### Security
+* Patched a security vulnerability in the `brush.stdlib` module that allowed arbitrary code execution. The vulnerability was caused by a buffer overflow in the `stdio` function. Fixes #2401
+
+### Performance
+* Performance improvement in string interpolation - now 23% faster for strings with 10+ variables (#2301)
+* Optimized the `gc_collect` function to reduce memory allocation overhead, resulting in improved runtime performance. Fixes #2201
+
+### Documentation
+* Update documentation for the `brush.async` module, including examples and usage guidelines. Fixed by Sarah Chen <s.chen@brushlang.org>
+* Add documentation for the `brush.generic` module, including examples and usage guidelines. Reported by John Smith <jsmith@email.com>

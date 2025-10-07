@@ -1,0 +1,95 @@
+You are a technical writer tasked with updating the Brush Language documentation from version 1.2 to version 1.3.
+
+TASK: Update the v1.2 guide to v1.3 using the provided change log.
+
+INPUTS:
+
+<v1_2_guide>
+# Brush Language - Version 1.2.0 Release Notes
+Released: January 15, 2025
+
+## Overview
+Version 1.2 of the Brush language brings significant enhancements to the type inference system, performance improvements, and a plethora of bug fixes. This release includes major updates to the compiler, runtime, and standard library, ensuring a more robust and efficient development experience. We're excited to introduce these changes, which have been thoroughly tested and validated through our rigorous CI/CD pipeline.
+
+The Brush language continues to evolve with a focus on developer productivity and code quality. This version is compatible with 1.1.x modules, ensuring a seamless upgrade path for existing projects. For a complete list of fixes and updates, please refer to the [CHANGELOG_1.2.md](CHANGELOG_1.2.md) document.
+
+## Highlights
+- **Improved Type Inference System**: Version 1.2 introduces enhanced type inference for generic functions, significantly reducing the need for explicit type annotations. The compiler now performs bidirectional type checking during the constraint resolution phase, allowing it to infer complex generic types from context. This improvement is particularly noticeable in functional programming patterns involving higher-order functions and closures.
+- **Async/Await Syntax**: The async/await syntax has been updated to align with modern programming practices. Developers can now write asynchronous code that is easier to read and maintain, using the `brush.async.timeout(duration: int, callback: fn)` function for handling timeouts.
+- **Performance Improvements**: This release includes a 15% reduction in compile time and a 40% smaller binary size, thanks to optimizations in the compiler and runtime. The `gc_collect()` function has been improved to reduce memory allocation overhead.
+- **Error Handling**: Error codes have been standardized, with the introduction of `E0308` for type errors and `SEGFAULT_0x7f` for runtime exceptions. The `parseExpression()` function now provides more informative error messages.
+
+## Breaking Changes
+⚠️ **String Encoding Change**: The default string encoding has changed from UTF-8 to UTF-16 for Windows compatibility. Existing code that relies on byte-level string operations may need adjustment. See the migration guide in `docs/migration/1.1-to-1.2.md` for details.
+
+## Bug Fixes
+A comprehensive list of bug fixes can be found in the [CHANGELOG_1.2.md](CHANGELOG_1.2.md) document. Notable fixes include issues #1840-#1891, which address stability and performance concerns.
+
+## Performance Improvements
+Version 1.2 brings significant performance enhancements, including a 23% faster string interpolation and improved garbage collection. The runtime footprint has been reduced from 8MB to 5.2MB, resulting in a more efficient development environment.
+
+## Deprecation Notices
+The `Token.IDENTIFIER` enum will be removed in a future version, in favor of the more flexible `Token.Symbol` type. Developers are encouraged to update their code to use the new type.
+
+## Installation & Upgrade
+To upgrade to Version 1.2, simply download the latest installer from the Brush website. For migration guidance, please refer to the `docs/migration/1.1-to-1.2.md` document.
+
+## Dependencies
+This release requires LLVM 15.0+ and is compatible with GCC 11+. The standard library has been updated to include the latest versions of dependent libraries.
+</v1_2_guide>
+
+<change_log>
+## [1.3.0] - 2025-02-20
+
+### Added
+- Pattern matching support with `match` expressions for algebraic data types. Syntax: `match value { Pattern1 => expr1, Pattern2 => expr2 }` (#1923)
+- New `brush.collections.HashMap` implementation using Robin Hood hashing, offering 35% better performance than the previous implementation. Thanks to Alex Kim <a.kim@brushdev.io>
+- Added `--emit-llvm` compiler flag for generating LLVM IR output (#1945)
+
+### Changed  
+- **BREAKING**: Deprecated `Token.IDENTIFIER` has been removed. Use `Token.Symbol` instead. Migration guide: `docs/migration/1.2-to-1.3.md` (#1851)
+- Updated async runtime to use io_uring on Linux for improved I/O performance. Falls back to epoll on older kernels
+- Modified `parseExpression()` error messages to include source location and suggestion hints
+
+### Fixed
+- Resolved deadlock in concurrent garbage collection when multiple threads trigger GC simultaneously. Reported by Chen Wei <c.wei@techcorp.io> (#1998)
+- Fixed type inference bug with nested generic constraints in `TypeChecker::resolve_constraints()` (#2011)
+- Corrected off-by-one error in UTF-16 string indexing that caused crashes with certain emoji sequences (#2034)
+
+### Security
+- Fixed buffer overflow vulnerability in JSON parser when handling deeply nested objects (CVE-2025-2234). Reported by security researcher Maria Santos
+- Patched integer underflow in memory allocator that could lead to heap corruption (#2041)
+
+### Performance
+- Optimized pattern matching compilation - generated code is now 28% faster for complex patterns
+- Reduced compiler memory usage by 18% through improved AST representation
+- String concatenation is now 45% faster for strings over 1KB
+
+### Deprecated
+- `brush.async.timeout()` function is deprecated in favor of `brush.async.with_timeout()` which provides better error handling. Will be removed in v1.4
+
+### Documentation
+- Complete rewrite of pattern matching documentation with comprehensive examples at `docs/language/pattern-matching.md`
+- Updated async/await guide to reflect io_uring changes on Linux
+- Added performance tuning guide at `docs/guides/performance-tuning.md`
+</change_log>
+
+DELIVERABLES:
+1. Updated VERSION_1.3.md guide with all changed sections rewritten
+2. A revision table at the end listing: Section | Change | Source (from change log)
+
+RULES:
+- Keep terminology consistent (use existing terms like "type inference", "garbage collector", "runtime", etc.)
+- Do NOT invent features - only include what's in the change log
+- Update version numbers from 1.2 to 1.3
+- Update release date to February 20, 2025
+- Reference CHANGELOG_1.3.md instead of CHANGELOG_1.2.md
+- Update compatibility notes (now compatible with 1.2.x modules)
+- Update migration guide references from 1.1-to-1.2 to 1.2-to-1.3
+
+QUALITY CHECKS:
+- Every item in the change log MUST appear in both the revision table AND the updated guide body
+- Each section should reflect appropriate changes from the change log
+- Maintain the same document structure as v1.2
+
+Generate the complete VERSION_1.3.md document now.

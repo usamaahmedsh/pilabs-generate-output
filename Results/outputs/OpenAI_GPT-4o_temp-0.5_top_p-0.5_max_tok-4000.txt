@@ -1,0 +1,101 @@
+```markdown
+# Brush Language - Version 1.2.0 Release Notes
+
+Released: January 15, 2025
+
+## Overview
+
+Version 1.2 of the Brush programming language brings a suite of enhancements and optimizations designed to improve developer productivity and application performance. This release focuses on refining the language's core features, enhancing the runtime efficiency, and addressing critical bugs reported by our community. We are excited to introduce several new capabilities that streamline asynchronous programming and improve memory management.
+
+This release includes significant updates to the type inference system, making it more robust and capable of handling complex generic functions. Additionally, we've made strides in optimizing the garbage collector, reducing memory footprint and improving allocation speeds. Developers can now leverage these improvements to build more efficient and reliable applications.
+
+## Highlights
+
+### Enhanced Asynchronous Programming
+
+Brush 1.2 introduces the `brush.async.timeout(duration: int, callback: fn)` function, allowing developers to set timeouts for asynchronous operations. This feature simplifies error handling in asynchronous workflows by providing a clear mechanism to manage long-running tasks.
+
+```brush
+brush.async.timeout(5000, fn() {
+    println("Operation timed out");
+});
+```
+
+### Improved Type Inference System
+
+The type inference system has been significantly enhanced to reduce the need for explicit type annotations. The compiler now performs bidirectional type checking during constraint resolution, enabling it to infer complex generic types from context. This improvement is particularly beneficial for functional programming patterns involving higher-order functions and closures.
+
+### Optimized Garbage Collector
+
+The garbage collector has been optimized to reduce runtime memory usage by 35%. This optimization is achieved through improved object tracking and concurrent collection strategies, resulting in faster allocation times and reduced pause durations.
+
+### Performance Metrics
+
+- **Compile Time Reduction**: Experience a 15% reduction in compile time due to improved parsing algorithms.
+- **Binary Size**: The runtime binary size has been reduced from 8MB to 5.2MB, thanks to codebase refactoring and dead code elimination.
+
+## Breaking Changes
+
+⚠️ **String Encoding Change**: The default string encoding has changed from UTF-8 to UTF-16 for Windows compatibility. Existing code that relies on byte-level string operations may need adjustment. See migration guide in `docs/migration/1.1-to-1.2.md`.
+
+## Bug Fixes
+
+For a complete list of fixes, see [CHANGELOG_1.2.md](CHANGELOG_1.2.md).
+
+## Performance Improvements
+
+The runtime performance has been enhanced with several optimizations, including a 23% speedup in string interpolation for strings with 10+ variables.
+
+## Deprecation Notices
+
+- The `old_callback` function is deprecated and will be removed in version 1.3. Developers are encouraged to use the new async/await syntax.
+
+## Installation & Upgrade
+
+Developers upgrading from 1.1.x should note the changes in string encoding and update their code accordingly. The upgrade process is straightforward, with no major configuration changes required.
+
+## Dependencies
+
+- Requires LLVM 15.0+
+- Compatible with GCC 11+
+
+---
+
+# CHANGELOG_1.2.md
+
+## [1.2.0] - 2025-01-15
+
+### Added
+
+- Introduced `brush.async.timeout(duration: int, callback: fn)` for managing asynchronous operation timeouts (#1840).
+- Added support for UTF-16 string encoding on Windows platforms to enhance compatibility (#1852).
+
+### Changed
+
+- Updated type inference mechanism to support bidirectional type checking, improving inference accuracy for generic functions (#1861).
+- Modified garbage collector to use concurrent collection strategies, reducing memory usage by 35% (fixes #1873).
+
+### Fixed
+
+- Fixed issue with `parseExpression()` causing incorrect parsing of nested ternary operators (fixes #1884).
+- Resolved SEGFAULT in garbage collector during concurrent object allocation. Reported by Emma Rodriguez <e.rodriguez@techcorp.io>
+- Addressed memory leak in `gc_collect()` when handling cyclic references (fixes #1890). Thanks to Mike Torres for reporting.
+
+### Security
+
+- Patched vulnerability in `Token.IDENTIFIER` handling that could lead to unauthorized access (fixes #1902).
+
+### Deprecated
+
+- Deprecated `old_callback` function in favor of async/await syntax. Scheduled for removal in version 1.3 (#1910).
+
+### Performance
+
+- Performance improvement in string interpolation - now 23% faster for strings with 10+ variables (#1920).
+- Optimized lexer performance in `src/compiler/lexer.br` to reduce tokenization time by 18% (#1935).
+
+### Documentation
+
+- Updated documentation for async/await syntax, previous examples was using deprecated callback style (fixes #1945).
+- Clarified error codes in stdlib/io.brush documentation to prevent confusion (fixes #1950). Fixed by Sarah Chen <s.chen@brushlang.org>
+```

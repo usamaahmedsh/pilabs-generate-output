@@ -1,0 +1,95 @@
+```markdown
+# Brush Language - Version 1.2.0 Release Notes
+Released: January 15, 2025
+
+## Overview
+
+Version 1.2 of the Brush programming language introduces several exciting enhancements and optimizations, further solidifying its place as a versatile tool for developers. This release focuses on improving performance, expanding language features, and addressing numerous community-reported issues. Developers can now enjoy a more robust experience with improved compile times and reduced runtime footprint.
+
+This update also prepares the groundwork for future developments by deprecating outdated features and ensuring compatibility with the latest toolchains. We are thrilled to bring these improvements to our user base and look forward to seeing how they enhance your projects.
+
+## Highlights
+
+### Enhanced Async/Await Syntax
+
+Version 1.2 brings improved syntax for async/await, allowing for more readable and concise asynchronous code. The updated parser now supports direct chaining of asynchronous calls without intermediate variables. For example:
+
+```brush
+async function fetchData() {
+    let data = await networkRequest().then(processData);
+}
+```
+
+### Performance Optimizations
+
+We've optimized the string interpolation mechanism, resulting in a 23% performance boost for strings containing more than ten variables. This enhancement leverages an internal caching strategy that reduces redundant memory allocations during runtime.
+
+### Improved Type Inference System
+
+This release introduces a more sophisticated type inference system for generic functions. By employing bidirectional type checking, the compiler can now infer complex types from context, reducing the need for explicit annotations. This is particularly beneficial in functional programming paradigms.
+
+### Security Enhancements
+
+Critical security patches have been applied to address vulnerabilities in the garbage collector and network modules. These updates fortify Brush against potential exploits, ensuring safer execution environments for your applications.
+
+## Breaking Changes
+
+⚠️ **String Encoding Change**: The default string encoding has been updated from UTF-8 to UTF-16 to enhance compatibility with Windows platforms. Code that relies on byte-level operations may require adjustments. Please refer to the migration guide in `docs/migration/1.1-to-1.2.md` for detailed instructions.
+
+## Bug Fixes
+
+For a complete list of bug fixes and minor improvements, please see [CHANGELOG_1.2.md](CHANGELOG_1.2.md).
+
+## Performance Improvements
+
+- 15% reduction in compile time due to optimized AST traversal algorithms.
+- Binary size reduced by 40%, decreasing from 8MB to 5.2MB, thanks to refined code generation techniques.
+
+## Deprecation Notices
+
+- The `oldNetworkRequest()` function is deprecated and will be removed in version 1.3.0. Transition to `networkRequest()` for improved performance and security.
+- The legacy callback-based asynchronous API will be phased out in future releases.
+
+## Installation & Upgrade
+
+Developers upgrading from version 1.1.x should ensure compatibility with LLVM 15.0+ and GCC 11+. Migration steps for addressing breaking changes are available in the documentation.
+
+## Dependencies
+
+- Updated to use LLVM 15.0+ for improved compilation performance.
+- Now compatible with GCC 11+, leveraging the latest compiler optimizations.
+
+---
+
+```markdown
+## [1.2.0] - 2025-01-15
+
+### Added
+- Introduced enhanced async/await syntax for streamlined asynchronous operations. The new parser now supports direct chaining of async calls (see #1852).
+- Implemented a sophisticated type inference system for generics, improving compiler accuracy and reducing the need for explicit type annotations (#1903).
+
+### Changed
+- Updated default string encoding from UTF-8 to UTF-16 to improve cross-platform compatibility. Developers should review code for byte-level string operations (fixes #1849).
+- Revised internal caching mechanism for string interpolation, boosting performance by 23% for complex strings (#2301).
+
+### Fixed
+- Resolved a compiler crash when using nested lambda expressions with closure capture. The error occurred in `eval_context()` due to scope resolution failures (fixes #1847).
+- Patched memory leak in garbage collector during concurrent object allocation. The issue was identified in `gc_collect()` and has been mitigated. Reported by Emma Rodriguez <e.rodriguez@techcorp.io>.
+- Addressed SEGFAULT in the runtime environment when handling large datasets in `parseExpression()`. Stack trace: at brush.runtime.eval:142 (fixes #203).
+
+### Security
+- Applied critical security updates to the garbage collector and network modules to address potential vulnerabilities (see #1888).
+
+### Deprecated
+- Deprecated `oldNetworkRequest()` in favor of `networkRequest()`. The former will be removed in version 1.3.0 (#1875).
+- Legacy callback-based asynchronous API is marked for removal in future releases.
+
+### Performance
+- Optimized AST traversal algorithms, resulting in a 15% reduction in compile time (#1940).
+- Binary size reduced by 40%, optimizing runtime footprint from 8MB to 5.2MB (#1935).
+
+### Documentation
+- Updated documentation for async/await syntax, previous examples were using deprecated callback style. Thanks to Mike Torres for reporting.
+- Revised migration guide for transitioning from version 1.1.x to 1.2, including code examples for updated async patterns.
+
+```

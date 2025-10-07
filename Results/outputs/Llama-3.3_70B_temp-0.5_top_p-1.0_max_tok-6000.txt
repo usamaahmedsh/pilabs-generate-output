@@ -1,0 +1,98 @@
+**VERSION_1.2.md**
+# Brush Language - Version 1.2.0 Release Notes
+Released: January 15, 2025
+
+## Overview
+Version 1.2 of the Brush language brings significant improvements to the type inference system, performance, and bug fixes. This release includes major features such as enhanced generic function type inference, improved string interpolation, and a new async/await syntax. We're excited to introduce these changes, which will improve the overall developer experience and make Brush a more competitive language in the industry.
+
+The new type inference system reduces the need for explicit type annotations, making it easier to write generic functions and functional programming patterns. The improved string interpolation feature is now 23% faster for strings with 10+ variables. Additionally, the new async/await syntax provides a more concise and readable way to write asynchronous code.
+
+## Highlights
+* **Improved Type Inference System**: The compiler now performs bidirectional type checking during the constraint resolution phase, allowing it to infer complex generic types from context.
+```brush
+// Example of improved type inference
+fn identity<T>(x: T) -> T {
+    x
+}
+```
+* **String Interpolation**: The string interpolation feature is now faster and more efficient, with a 23% reduction in execution time for strings with 10+ variables.
+```brush
+// Example of string interpolation
+let name = "John";
+let age = 30;
+println!("My name is ${name} and I am ${age} years old.");
+```
+* **Async/Await Syntax**: The new async/await syntax provides a more concise and readable way to write asynchronous code.
+```brush
+// Example of async/await syntax
+async fn main() {
+    let result = await async_operation();
+    println!("Result: ${result}");
+}
+```
+## Breaking Changes
+⚠️ **String Encoding Change**: The default string encoding has changed from UTF-8 to UTF-16 for Windows compatibility. Existing code that relies on byte-level string operations may need adjustment. See migration guide in docs/migration/1.1-to-1.2.md.
+```brush
+// Example of string encoding change
+// Before
+let str = "Hello, World!".encode("utf-8");
+
+// After
+let str = "Hello, World!".encode("utf-16");
+```
+## Bug Fixes
+For a complete list of fixes, see CHANGELOG_1.2.md. This release includes fixes for issues #1840-#1891, which address various bugs and performance issues.
+
+## Performance Improvements
+This release includes a 15% reduction in compile time and a 40% smaller binary size. The runtime footprint has also been reduced from 8MB to 5.2MB.
+
+## Deprecation Notices
+The following features will be removed in future versions:
+* The `brush.sync` module will be replaced by the new `brush.async` module.
+* The `Token.IDENTIFIER` type will be removed in favor of the new `Token.Symbol` type.
+
+## Installation & Upgrade
+To upgrade to version 1.2, simply run `brush update` in your terminal. For more information, see the installation guide in docs/installation.md.
+
+## Dependencies
+This release includes updated versions of the following libraries:
+* LLVM 15.0+
+* GCC 11+
+* Brush standard library 1.2.0
+
+---
+
+**CHANGELOG_1.2.md**
+## [1.2.0] - 2025-01-15
+
+### Added
+* Fix async/await syntax support, now compiles without errors (fixes #203)
+* Added `brush.async.timeout()` function to handle async operation timeouts
+* Updated `stdlib/io.brush` to include new `read_line()` function
+
+### Changed
+* Update documentation for async/await syntax, previous examples was using deprecated callback style
+* Changed `Token.IDENTIFIER` type to `Token.Symbol` for better consistency (fixes #1847)
+* Improved performance of string interpolation - now 23% faster for strings with 10+ variables (#2301)
+
+### Fixed
+* Fixed compiler crash when using nested lambda expressions with closure capture (fixes #1847)
+* Resolved SEGFAULT in garbage collector during concurrent object allocation (reported by Emma Rodriguez <e.rodriguez@techcorp.io>)
+* Patched memory leak in `gc_collect()` function (fixes #1850)
+* Fixed error E0308 when using invalid token in `parseExpression()` function (reported by John Doe <j.doe@example.com>)
+
+### Security
+* Patched security vulnerability in `brush.runtime.eval()` function (fixes #1880)
+
+### Deprecated
+* Deprecated `brush.sync` module in favor of new `brush.async` module
+* Deprecated `Token.IDENTIFIER` type in favor of new `Token.Symbol` type
+
+### Performance
+* Improved performance of compile-time evaluation - now 15% faster
+* Reduced runtime footprint from 8MB to 5.2MB
+
+### Documentation
+* Updated documentation for `brush.async` module
+* Added example code for `brush.async.timeout()` function
+* Fixed minor typos in `stdlib/io.brush` documentation (reported by Mike Torres <m.torres@example.com>)

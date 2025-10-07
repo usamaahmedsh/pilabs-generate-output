@@ -1,0 +1,81 @@
+### VERSION_1.2.md
+# Brush Language - Version 1.2.0 Release Notes
+Released: January 15, 2025
+
+## Overview
+Version 1.2 of the Brush language is a significant milestone that brings numerous enhancements, fixes, and performance improvements. This release includes major updates to the type inference system, improvements in string interpolation, and several bug fixes. We're excited to introduce these changes, which will enhance the overall development experience for Brush programmers.
+
+The Brush language continues to evolve with a focus on simplicity, performance, and developer productivity. Version 1.2 is compatible with 1.1.x modules, ensuring a smooth transition for existing projects. This release is the result of extensive testing, including thousands of test cases run through our CI/CD pipeline, ensuring high-quality and reliability.
+
+## Highlights
+- **Improved Type Inference System**: Version 1.2 introduces enhanced type inference for generic functions, significantly reducing the need for explicit type annotations. The compiler now performs bidirectional type checking during the constraint resolution phase, allowing it to infer complex generic types from context. This improvement is particularly noticeable in functional programming patterns involving higher-order functions and closures.
+- **String Interpolation Performance**: String interpolation is now 23% faster for strings with 10+ variables, thanks to optimizations in the `parseExpression()` function. This change improves the performance of applications that heavily rely on string formatting.
+- **Garbage Collection Updates**: The garbage collector has been updated to address a memory leak that occurred during concurrent object allocation. This fix, reported by Emma Rodriguez, improves the overall memory safety and performance of Brush applications.
+
+## Breaking Changes
+⚠️ **String Encoding Change**: The default string encoding has changed from UTF-8 to UTF-16 for Windows compatibility. Existing code that relies on byte-level string operations may need adjustment. Developers upgrading from 1.1.x should note the following example:
+```brush
+// Before (1.1.x)
+func printBytes(str: string) {
+    for byte in str.bytes() {
+        print(byte)
+    }
+}
+
+// After (1.2.0)
+func printBytes(str: string) {
+    for char in str.chars() {
+        print(char.codePoint)
+    }
+}
+```
+See the migration guide in `docs/migration/1.1-to-1.2.md` for more details.
+
+## Bug Fixes
+For a complete list of fixes, see `CHANGELOG_1.2.md`. Notable fixes include resolutions to issues #1840-#1891, which address various compiler crashes and runtime errors.
+
+## Performance Improvements
+Version 1.2 brings a 15% reduction in compile time and a 40% smaller binary size compared to version 1.1.x. These improvements are due to optimizations in the compiler's frontend and backend, including better handling of generic types and improved code generation.
+
+## Deprecation Notices
+The `brush.sync` module is deprecated in favor of `brush.async` and will be removed in version 1.3.0. Developers are advised to migrate their code to use the new async/await syntax.
+
+## Installation & Upgrade
+To upgrade to version 1.2, simply run `brush update` in your terminal. For new installations, download the latest version from our website. Note that version 1.2 requires LLVM 15.0+ and is compatible with GCC 11+.
+
+## Dependencies
+- LLVM: 15.0+
+- GCC: 11+
+- Runtime footprint reduced from 8MB to 5.2MB
+
+---
+
+### CHANGELOG_1.2.md
+## [1.2.0] - 2025-01-15
+
+### Added
+- New `brush.async.timeout()` function for setting timeouts on async operations. Reported by John Smith <jsmith@email.com>.
+- Support for UTF-16 string encoding on Windows platforms.
+
+### Changed
+- Update documentation for async/await syntax, previous examples were using deprecated callback style.
+- Improved error messages for `E0308` and `SEGFAULT_0x7f` errors, now including more context.
+
+### Fixed
+- Fixed compiler crash when using nested lambda expressions with closure capture. The issue occurred in `eval_context()` when scope resolution failed for shadowed variables (fixes #1847).
+- Resolved SEGFAULT in garbage collector during concurrent object allocation. Reported by Emma Rodriguez <e.rodriguez@techcorp.io>.
+- Patched memory leak in `gc_collect()` function, which was causing performance issues over time.
+- Fix for `ERR_INVALID_TOKEN` error when parsing invalid tokens in `src/compiler/lexer.br`.
+
+### Security
+- Security patch for potential buffer overflow in `stdlib/io.brush`. Thanks to Mike Torres for reporting.
+
+### Performance
+- Performance improvement in string interpolation - now 23% faster for strings with 10+ variables (#2301).
+- Optimized `parseExpression()` function for better performance.
+
+### Documentation
+- Updated user manual to reflect changes in async/await syntax and new features.
+- Added example code snippets for `brush.async.timeout()` and UTF-16 string encoding.
+
+Note: This changelog is not exhaustive; for a full list of changes, see the commit history on our Git repository.

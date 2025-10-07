@@ -1,0 +1,72 @@
+# VERSION_1.2.md
+
+# Brush Language - Version 1.2.0 Release Notes
+
+Released: March 22, 2025
+
+## Overview
+
+Brush Language 1.2.0 represents a significant milestone in our journey to provide a more robust, performant, and developer-friendly programming experience. This release focuses on enhancing the type system, improving runtime performance, and adding several quality-of-life features that streamline common development patterns.
+
+We've addressed over 45 bugs reported by our growing community and introduced optimizations that make Brush programs run faster and consume fewer resources. This version maintains backward compatibility with Brush 1.1.x modules while laying groundwork for future innovations.
+
+## Highlights
+
+### Enhanced Type Inference System
+
+Version 1.2 introduces powerful type inference capabilities for generic functions, significantly reducing the need for explicit type annotations. The compiler now performs bidirectional type checking during constraint resolution, allowing it to infer complex generic types from context. This improvement is particularly beneficial for functional programming patterns involving higher-order functions and closures.
+
+```brush
+// Before (Brush 1.1):
+func map<T, U>(array: Array<T>, mapper: fn(T) -> U) -> Array<U> {
+    // implementation
+}
+let doubled = map<int, int>([1, 2, 3], fn(x: int) -> int { return x * 2 })
+
+// Now (Brush 1.2):
+let doubled = map([1, 2, 3], fn(x) { return x * 2 })  // Types inferred automatically
+```
+
+### Async/Await Pattern
+
+We're excited to introduce first-class async/await support in Brush 1.2. This modern concurrency pattern simplifies asynchronous code by eliminating callback chains and making async code read more like synchronous code. The implementation leverages our existing event loop architecture with zero overhead compared to callback-based approaches.
+
+```brush
+// New async/await syntax:
+async func fetchUserData(userId: string) -> User {
+    let response = await httpClient.get("/api/users/" + userId)
+    return User.fromJson(response.body)
+}
+
+// Use in an async context:
+async func displayUserProfile(userId: string) {
+    let user = await fetchUserData(userId)
+    ui.updateProfile(user)
+}
+```
+
+### Pattern Matching Enhancements
+
+Pattern matching now supports destructuring of nested data structures and includes exhaustiveness checking. The compiler will warn about non-exhaustive pattern matches, helping catch potential runtime errors during development. This feature integrates with the type system to provide compile-time guarantees about pattern coverage.
+
+### Memory Management Improvements
+
+The garbage collector has been completely rewritten with a generational approach that reduces collection pauses by up to 60%. Long-running applications will see the most significant benefits, with average pause times dropping from 12ms to 4.5ms. The new GC also features improved heap fragmentation handling and more predictable memory usage patterns.
+
+### Standard Library Expansion
+
+The standard library has been expanded with 14 new modules covering common tasks like date manipulation, cryptography, and advanced data structures. Notable additions include `brush.collections.OrderedMap`, `brush.crypto.hash`, and comprehensive datetime parsing/formatting in `brush.time`.
+
+## Breaking Changes
+
+⚠️ **String Encoding Change**: The default string encoding has changed from UTF-8 to UTF-16 for better cross-platform compatibility. Existing code that relies on byte-level string operations may need adjustment. See migration guide in docs/migration/1.1-to-1.2.md.
+
+⚠️ **Module Import Behavior**: Module imports now follow strict resolution rules. Circular dependencies are no longer permitted and will result in compile-time errors rather than unpredictable runtime behavior. The compiler will suggest dependency restructuring when circular references are detected.
+
+## Bug Fixes
+
+Version 1.2.0 addresses 45 bugs reported since the 1.1 release. Major fixes include resolving parser inconsistencies with nested expressions, fixing memory leaks in the standard library, and correcting type inference issues with generic functions. For a complete list of fixes, see CHANGELOG_1.2.md or issues #1840-#1891 in the issue tracker.
+
+## Performance Improvements
+
+- **Compiler Speed**: Compilation times have improved by 22% on average, with incremental builds seeing up to 

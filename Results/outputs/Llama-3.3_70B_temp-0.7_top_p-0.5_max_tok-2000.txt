@@ -1,0 +1,58 @@
+### VERSION_1.2.md
+# Brush Language - Version 1.2.0 Release Notes
+Released: January 15, 2025
+
+## Overview
+Version 1.2 of the Brush language is a significant update that brings numerous improvements, fixes, and new features to enhance the development experience. This release includes major updates to the type inference system, improvements in string interpolation, and several bug fixes. We're excited to introduce these changes, which will make Brush more efficient, stable, and enjoyable to use.
+
+The Brush team has been working diligently to address community feedback and issues, ensuring that this version is more robust and user-friendly. With version 1.2, developers can now leverage enhanced type inference for generic functions, reducing the need for explicit type annotations. This improvement is particularly beneficial for functional programming patterns involving higher-order functions and closures.
+
+## Highlights
+- **Improved Type Inference System**: Version 1.2 introduces enhanced type inference for generic functions, significantly reducing the need for explicit type annotations. The compiler now performs bidirectional type checking during the constraint resolution phase, allowing it to infer complex generic types from context. For example, the `brush.generic.map()` function can now automatically infer the return type based on the input types.
+- **String Interpolation Performance**: This release includes a performance improvement in string interpolation, making it 23% faster for strings with 10+ variables. This is achieved through optimizations in the `parseExpression()` function and better handling of `Token.IDENTIFIER` tokens.
+- **Async/Await Syntax Update**: The documentation for async/await syntax has been updated to reflect the latest best practices, moving away from deprecated callback styles. Developers can now use `brush.async.timeout(duration: int, callback: fn)` for more readable and maintainable asynchronous code.
+
+## Breaking Changes
+⚠️ **String Encoding Change**: The default string encoding has changed from UTF-8 to UTF-16 for Windows compatibility. Existing code that relies on byte-level string operations may need adjustment. See the migration guide in `docs/migration/1.1-to-1.2.md` for more information.
+
+## Bug Fixes
+For a complete list of fixes, see `CHANGELOG_1.2.md`. Notable fixes include resolving the SEGFAULT in the garbage collector during concurrent object allocation and addressing the memory leak in the `gc_collect()` function.
+
+## Performance Improvements
+Version 1.2 brings a 15% reduction in compile time and a 40% smaller binary size compared to the previous version. These improvements are due to optimizations in the compiler's lexer and parser, as well as better memory management.
+
+## Deprecation Notices
+The `stdlib/io.brush` module's `readFile()` function is deprecated in favor of `brush.fs.readFile()`, which offers better performance and compatibility. Developers should update their code to use the new function to avoid issues in future versions.
+
+## Installation & Upgrade
+To upgrade from version 1.1.x, simply run `brush update` in your terminal. Note that Brush 1.2 is compatible with 1.1.x modules, but it's recommended to update dependencies to ensure the best experience. For detailed migration notes, refer to the `docs/migration/1.1-to-1.2.md` guide.
+
+## Dependencies
+This release updates the LLVM dependency to version 15.0+ and is compatible with GCC 11+. Ensure your development environment meets these requirements for optimal performance.
+
+### CHANGELOG_1.2.md
+## [1.2.0] - 2025-01-15
+
+### Added
+- Fix support for nested lambda expressions with closure capture. The issue was resolved in `eval_context()` when scope resolution failed for shadowed variables (fixes #1847). Reported by John Smith <jsmith@email.com>.
+
+### Changed
+- Update documentation for async/await syntax, previous examples was using deprecated callback style. Now, `brush.async.timeout()` is the recommended approach.
+- Improved string interpolation performance - now 23% faster for strings with 10+ variables (#2301).
+
+### Fixed
+- Resolved SEGFAULT in garbage collector during concurrent object allocation. Reported by Emma Rodriguez <e.rodriguez@techcorp.io>. The fix involved updating `gc_collect()` to handle concurrent access better.
+- Fixed compiler crash when using nested lambda expressions with closure capture. The issue occurred in `eval_context()` when scope resolution failed for shadowed variables (fixes #1847).
+- Patched memory leak in `gc_collect()`. Memory leak was addressed by fixing a reference counting issue at `brush.runtime.eval:142`.
+
+### Security
+- Patched potential buffer overflow in `stdlib/io.brush`. The issue was fixed by validating input lengths in `readFile()` (fixes [BRH-302]).
+
+### Performance
+- Optimized `parseExpression()` for better performance, especially with complex expressions. This change reduces compile time by 15%.
+
+### Documentation
+- Updated user manual to reflect changes in async/await syntax and string interpolation. Thanks to Mike Torres for reporting inconsistencies in the previous documentation.
+
+### Deprecated
+- The `stdlib/io.brush` module's `readFile()` function is deprecated. Use `brush.fs.readFile()` instead for better performance and compatibility.

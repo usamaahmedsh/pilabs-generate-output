@@ -1,0 +1,105 @@
+```markdown
+# Brush Language - Version 1.2.0 Release Notes
+Released: January 15, 2025
+
+## Overview
+
+Version 1.2 of the Brush programming language brings a host of new features, improvements, and bug fixes that enhance both the developer experience and the performance of Brush applications. This release focuses on optimizing core language features, expanding the standard library, and addressing critical bugs reported by our community. We're excited to introduce a more robust and efficient version that aligns with modern development practices.
+
+This release includes significant enhancements to the type inference system, new asynchronous programming capabilities, and critical bug fixes that improve stability and reliability. Developers can now enjoy a more seamless coding experience with reduced compile times and improved runtime efficiency.
+
+For a complete list of fixes and updates, see [CHANGELOG_1.2.md](CHANGELOG_1.2.md).
+
+## Highlights
+
+### Enhanced Type Inference System
+
+Version 1.2 introduces an improved type inference system that reduces the need for explicit type annotations. The compiler now uses bidirectional type checking during constraint resolution, enabling it to infer complex generic types more effectively. This is particularly beneficial for developers using higher-order functions and closures.
+
+### Asynchronous Programming Support
+
+We've added native support for asynchronous programming with the new `brush.async.timeout(duration: int, callback: fn)` function. This feature allows developers to write non-blocking code more intuitively, improving the responsiveness of applications. Here's a quick example:
+
+```brush
+brush.async.timeout(5000, fn() {
+    println("Timeout reached!");
+});
+```
+
+### String Interpolation Optimization
+
+String interpolation is now 23% faster for strings with 10+ variables, thanks to a new parsing strategy that reduces overhead during runtime evaluation. This improvement is achieved by optimizing the `parseExpression()` function to handle complex string structures more efficiently.
+
+### Expanded Standard Library
+
+The standard library has been expanded with new modules for file I/O and networking. These modules provide robust APIs for handling common tasks, such as reading and writing files or establishing network connections, with ease and reliability.
+
+## Breaking Changes
+
+⚠️ **String Encoding Change**: The default string encoding has changed from UTF-8 to UTF-16 for Windows compatibility. Existing code that relies on byte-level string operations may need adjustment. See the migration guide in `docs/migration/1.1-to-1.2.md`.
+
+## Bug Fixes
+
+This release addresses several critical bugs, including memory leaks and segmentation faults, to improve overall stability. For detailed information on each fix, refer to [CHANGELOG_1.2.md](CHANGELOG_1.2.md).
+
+## Performance Improvements
+
+- **Compile Time Reduction**: Experience a 15% reduction in compile time due to optimizations in the lexer and parser components.
+- **Runtime Footprint**: The runtime footprint has been reduced from 8MB to 5.2MB, resulting in more efficient memory usage.
+
+## Deprecation Notices
+
+- The `oldCallbackStyle()` function is deprecated and will be removed in version 1.3. Developers are encouraged to transition to the new async/await syntax.
+
+## Installation & Upgrade
+
+To upgrade to Brush 1.2, ensure your development environment meets the following requirements:
+- Requires LLVM 15.0+
+- Compatible with GCC 11+
+
+Developers upgrading from 1.1.x should note the changes in string encoding and adjust their code accordingly. For more details, see the migration guide.
+
+## Dependencies
+
+- Updated to use the latest version of the LLVM backend for improved performance and compatibility.
+
+---
+
+# CHANGELOG_1.2.md
+
+## [1.2.0] - 2025-01-15
+
+### Added
+
+- Introduced `brush.async.timeout(duration: int, callback: fn)` for asynchronous programming. This allows non-blocking code execution (#1923).
+- Expanded standard library with new modules for file I/O and networking, enhancing functionality for common tasks (fixes #1874).
+
+### Changed
+
+- Optimized string interpolation mechanism, resulting in a 23% performance boost for complex strings. Implemented by refining `parseExpression()` logic (#1901).
+- Updated default string encoding to UTF-16 for improved Windows compatibility. This change may affect byte-level operations (#1899).
+
+### Fixed
+
+- Resolved memory leak in garbage collector when handling large data structures. The issue was traced to `gc_collect()` not freeing memory correctly (fixes #203).
+- Fixed compiler crash when using nested lambda expressions with closure capture. The issue occurred in `eval_context()` when scope resolution failed for shadowed variables (fixes #1847).
+- Addressed SEGFAULT in garbage collector during concurrent object allocation. Reported by Emma Rodriguez <e.rodriguez@techcorp.io>.
+
+### Security
+
+- Patched vulnerability in the authentication module where invalid tokens were not being rejected properly (ERR_INVALID_TOKEN). Thanks to Mike Torres for reporting (#1940).
+
+### Deprecated
+
+- Marked `oldCallbackStyle()` as deprecated. This function will be removed in version 1.3 in favor of the new async/await syntax (#1880).
+
+### Performance
+
+- Reduced runtime footprint from 8MB to 5.2MB by optimizing memory allocation routines (fixes #1910).
+- Compile time improved by 15% through optimizations in lexer and parser components. Fixed by Sarah Chen <s.chen@brushlang.org>.
+
+### Documentation
+
+- Updated documentation for async/await syntax, previous examples was using deprecated callback style. Reported by John Smith <jsmith@email.com>.
+
+```

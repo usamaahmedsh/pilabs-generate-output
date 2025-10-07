@@ -1,0 +1,99 @@
+```markdown
+# Brush Language - Version 1.2.0 Release Notes
+Released: January 15, 2025
+
+## Overview
+
+Version 1.2 of the Brush programming language brings a series of new features, optimizations, and important bug fixes to enhance developer productivity and application performance. This release focuses on improving the language's robustness, especially in concurrent and asynchronous programming scenarios. Developers can now leverage the new features to write more efficient and expressive code with less boilerplate.
+
+We're excited to introduce major enhancements in type inference, asynchronous programming capabilities, and performance optimizations. These improvements aim to streamline the development process and reduce runtime overhead, allowing for the creation of more responsive applications.
+
+For a complete list of fixes and changes, please refer to the [CHANGELOG_1.2.md](CHANGELOG_1.2.md).
+
+## Highlights
+
+### Enhanced Asynchronous Programming
+
+This release includes the new `brush.async.timeout(duration: int, callback: fn)` function, enabling developers to set timeouts for asynchronous operations effortlessly. The function leverages an event loop to monitor and execute callbacks upon timeout, making it easier to manage long-running tasks. For example, use `brush.async.timeout(5000, handleTimeout)` to trigger `handleTimeout` after 5 seconds.
+
+### Improved Type Inference
+
+Version 1.2 introduces enhanced type inference for generic functions, significantly reducing the need for explicit type annotations. The compiler now performs bidirectional type checking during the constraint resolution phase, allowing it to infer complex generic types from context. This improvement is particularly noticeable in functional programming patterns involving higher-order functions and closures.
+
+### Performance Enhancements
+
+This release delivers a 15% reduction in compile time and a 40% smaller binary size due to optimizations in the code generation phase. The garbage collector has been optimized to reduce memory fragmentation, resulting in a runtime footprint reduced from 8MB to 5.2MB. These enhancements ensure that applications run faster and more efficiently.
+
+### Security Improvements
+
+Security has been bolstered with patches to address vulnerabilities in the standard library's I/O operations. The `stdlib/io.brush` module now includes stricter validation checks, preventing potential injection attacks.
+
+## Breaking Changes
+
+⚠️ **String Encoding Change**: The default string encoding has changed from UTF-8 to UTF-16 for Windows compatibility. Existing code that relies on byte-level string operations may need adjustment. See the migration guide in `docs/migration/1.1-to-1.2.md`.
+
+## Bug Fixes
+
+This release addresses several critical bugs, including a compiler crash when using nested lambda expressions and a SEGFAULT in the garbage collector. For detailed information, refer to the [CHANGELOG_1.2.md](CHANGELOG_1.2.md).
+
+## Performance Improvements
+
+- 15% reduction in compile time.
+- 40% smaller binary size.
+- Runtime footprint reduced from 8MB to 5.2MB.
+
+## Deprecation Notices
+
+The `Token.IDENTIFIER` method is deprecated and will be removed in future releases. Developers are encouraged to use the new `Token.getIdentifier()` method instead.
+
+## Installation & Upgrade
+
+To upgrade to version 1.2, follow the installation instructions in the `INSTALL.md` file. Developers upgrading from 1.1.x should note the breaking changes and adjust their code accordingly.
+
+## Dependencies
+
+- Requires LLVM 15.0+
+- Compatible with GCC 11+
+
+---
+
+## CHANGELOG_1.2.md
+
+## [1.2.0] - 2025-01-15
+
+### Added
+
+- Introduced `brush.async.timeout(duration: int, callback: fn)` for easier timeout handling in asynchronous operations (#1845).
+- Added support for UTF-16 string encoding for better Windows compatibility. Reported by John Smith <jsmith@email.com>.
+
+### Changed
+
+- Improved type inference for generic functions, reducing the need for explicit type annotations (#1846).
+- Updated standard library `stdlib/io.brush` for stricter I/O operation validation (fixes #1850).
+
+### Fixed
+
+- Fixed compiler crash when using nested lambda expressions with closure capture. The issue occurred in `eval_context()` when scope resolution failed for shadowed variables (fixes #1847).
+- Resolved SEGFAULT in garbage collector during concurrent object allocation. Reported by Emma Rodriguez <e.rodriguez@techcorp.io>.
+- Addressed memory leak in `gc_collect()` function, improving memory management during heavy load scenarios (#1849).
+- Corrected error code E0308 when parsing complex expression trees in `parseExpression()`.
+
+### Security
+
+- Patched potential injection vulnerabilities in `stdlib/io.brush` module. Thanks to Mike Torres for reporting.
+
+### Deprecated
+
+- Deprecated `Token.IDENTIFIER` in favor of `Token.getIdentifier()` for improved API consistency (#1851).
+
+### Performance
+
+- Performance improvement in string interpolation - now 23% faster for strings with 10+ variables (#2301).
+- Optimized garbage collector to reduce memory fragmentation, resulting in a smaller runtime footprint.
+
+### Documentation
+
+- Update documentation for async/await syntax, previous examples was using deprecated callback style.
+- Improved migration guide for transitioning from 1.1.x to 1.2, detailing changes in string encoding.
+
+```

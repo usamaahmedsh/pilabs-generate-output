@@ -1,0 +1,181 @@
+# VERSION_1.2.md
+
+# Brush Language - Version 1.2.0 Release Notes
+
+Released: March 22, 2025
+
+## Overview
+
+Brush 1.2.0 represents a significant milestone in the language's evolution, focusing on performance optimizations, enhanced type safety, and improved developer experience. This release introduces several new language features while maintaining backward compatibility with 1.1.x codebases, with only minor exceptions noted in the Breaking Changes section.
+
+We're excited to introduce the new pattern matching system, which enables more expressive and safer code when working with complex data structures. Additionally, this release includes substantial improvements to the compiler's type inference capabilities and a completely rewritten garbage collector that significantly reduces pause times.
+
+## Highlights
+
+### Pattern Matching
+
+Version 1.2 introduces comprehensive pattern matching capabilities, allowing developers to destructure complex data types with elegant syntax. The pattern matching system integrates with the type system to provide compile-time exhaustiveness checking, preventing runtime errors from unhandled cases. This feature is particularly valuable when working with algebraic data types and error handling scenarios.
+
+```brush
+match response {
+    Success(data) => processData(data),
+    Error(NetworkTimeout) => retry(request),
+    Error(InvalidAuth) => refreshToken().then(retry),
+    Error(e) => logError(e)
+}
+```
+
+### Enhanced Type Inference
+
+The type inference system has been significantly improved to handle more complex scenarios without requiring explicit type annotations. The compiler now performs bidirectional type checking during constraint resolution, allowing it to infer generic types from context with greater accuracy. This enhancement reduces boilerplate code by up to 30% in typical applications while maintaining type safety.
+
+### Asynchronous Programming Improvements
+
+Brush 1.2 brings substantial improvements to asynchronous programming with the introduction of the `async/await` syntax. This new approach replaces the callback-based model and provides a more intuitive way to write non-blocking code. The runtime scheduler has been optimized to efficiently manage thousands of concurrent tasks with minimal overhead.
+
+```brush
+async fn fetchUserData(userId: String) -> Result<UserProfile, ApiError> {
+    let token = await authService.getToken();
+    let response = await api.get("/users/" + userId, { headers: { "Authorization": token } });
+    return UserProfile.fromJson(response.body);
+}
+```
+
+### Improved Error Messages
+
+Compiler error messages have been completely redesigned to provide more context and actionable suggestions. Error messages now include color-coded snippets of the problematic code, clear explanations of the issue, and suggestions for how to fix it. This improvement significantly reduces debugging time, especially for new Brush developers.
+
+### Standard Library Enhancements
+
+The standard library has been expanded with new modules for working with dates (`brush.time`), regular expressions (`brush.regex`), and file system operations (`brush.fs`). Existing collections have been optimized for performance, with `HashMap` operations now 35% faster and `Vector` operations 22% faster on average.
+
+## Breaking Changes
+
+⚠️ **String Encoding Change**: The default string encoding has changed from UTF-8 to UTF-16 for better cross-platform compatibility. Code that relies on byte-level string operations may need adjustment. See migration guide in docs/migration/1.1-to-1.2.md.
+
+⚠️ **Deprecated APIs Removed**: Several APIs that were marked as deprecated in version 1.0 have been removed. This includes the `brush.util.oldParser` module and the `@legacy` annotation. Code using these features must be updated to use their modern equivalents.
+
+## Performance Improvements
+
+The Brush runtime has undergone significant performance optimizations in version 1.2:
+
+- The new generational garbage collector reduces average pause times from 12ms to under 3ms
+- Compiler throughput improved by 28%, resulting in faster build times
+- Runtime memory footprint reduced from 8.4MB to 5.7MB for typical applications
+- String operations are now 40% faster due to optimized internal representation
+- Function call overhead reduced by 15% through improved inlining heuristics
+
+## Bug Fixes
+
+Version 1.2 includes fixes for over 50 bugs, including several critical issues affecting stability and correctness. Key fixes include resolution of memory leaks in the standard library, fixes for compiler crashes with complex generic types, and corrections to the type checker for union types. For a complete list of fixes, see CHANGELOG_1.2.md.
+
+## Deprecation Notices
+
+The following features are deprecated in Brush 1.2 and will be removed in version 1.3:
+
+- The `brush.concurrent` module is deprecated in favor of the new `brush.async` module
+- The `@unsafe` annotation is deprecated and will be replaced with a more granular permission system
+- Dynamic imports using `require()` are deprecated in favor of the static `import` statement
+
+## Installation & Upgrade
+
+Brush 1.2 can be installed using the standard package manager:
+
+```
+brush-pkg install brush@1.2.0
+```
+
+Developers upgrading from 1.1.x should run the compatibility checker before upgrading:
+
+```
+brush-pkg check-compat --from=1.1 --to=1.2 ./your-project
+```
+
+The migration tool can automatically update most deprecated API usages:
+
+```
+brush-migrate 1.1-to-1.2 ./your-project
+```
+
+## Dependencies
+
+- Brush 1.2 requires LLVM 16.0+ for compilation
+- The standard library is compatible with libc 2.35+ on Linux systems
+- Windows builds require Visual C++ Redistributable 2023 or newer
+- macOS builds require macOS 11.0 (Big Sur) or newer
+
+## Community Contributions
+
+This release includes contributions from 37 community members, with special thanks to the core team members who led the development of major features. The Brush Foundation extends its gratitude to all contributors who helped make this release possible through code contributions, bug reports, and documentation improvements.
+
+For more information about Brush 1.2, including detailed API documentation and tutorials, visit the official documentation at https://docs.brushlang.org/1.2/.
+
+# CHANGELOG_1.2.md
+
+## [1.2.0] - 2025-03-22
+
+### Added
+
+- Added pattern matching syntax for complex data structures with exhaustiveness checking. Pattern matching enables more concise and safer code when working with algebraic data types. (#1842)
+
+- Introduced async/await syntax for more intuitive asynchronous programming. This replaces the callback-based approach and provides better error handling for concurrent operations. (BRH-302)
+
+- Added new standard library modules: brush.time for date operations, brush.regex for regular expressions, and brush.fs for enhanced file system access. Thanks to Maria Johnson for contributing the regex module implementation.
+
+- Implemented structured error messages with color-coded output and suggestions for fixes. New error format includes code snippets and points directly to the problematic code location. (#1901)
+
+### Changed
+
+- Update string encoding from UTF-8 to UTF-16 for better cross-platform compatibility. ⚠️ This is a breaking change that may affect code relying on byte-level string operations. [BRH-315]
+
+- Rewrote the type inference system to support bidirectional type checking. The compiler can now infer complex generic types from context without explicit annotations in most cases. (#1876)
+
+- Changed HashMap implementation to use Robin Hood hashing, resulting in 35% faster lookups and 28% reduced collision rate. (fixes #1850)
+
+- Refactored the module resolution algorithm to support circular dependencies with lazy evaluation. Reported by Alex Chen <a.chen@dataworks.com>
+
+### Fixed
+
+- Fix compiler crash when using nested lambda expressions with closure capture. The issue occurred in `eval_context()` when scope resolution failed for shadowed variables. (fixes #1847)
+
+- Fixed memory leak in the standard library's HTTP client when connections were aborted mid-request. The leak could cause significant memory consumption during network-intensive operations. [BRH-329]
+
+- Resolved SEGFAULT in garbage collector during concurrent object allocation at brush.runtime.memory.allocate:142. Reported by Emma Rodriguez <e.rodriguez@techcorp.io>
+
+- Fix incorrect type inference for union types with generic parameters. Previously, the compiler would sometimes select the wrong variant when multiple options were compatible. (ERR_INVALID_TYPE_RESOLUTION)
+
+- Fixed parser error when using multiline string literals containing escape sequences. The lexer was incorrectly calculating line numbers after processing escapes. (#1892)
+
+- Patched race condition in async task scheduler that could cause deadlocks when many tasks completed simultaneously. The fix improves the scheduler's lock granularity. Thanks to David Park for reporting and providing a reproduction case.
+
+### Performance
+
+- Completely rewrote the garbage collector to use a generational approach, reducing average pause times from 12ms to under 3ms. The new GC also features incremental collection for large heaps. (#1860)
+
+- Performance improvement in string interpolation - now 43% faster for strings with 10+ variables. The optimization eliminates redundant memory allocations during template processing. (#1901)
+
+- Optimized the compiler's AST traversal algorithm, resulting in 28% faster compilation times for large projects. Fixed by Sarah Chen <s.chen@brushlang.org>
+
+- Reduced runtime memory footprint from 8.4MB to 5.7MB by optimizing internal data structures and eliminating redundant metadata. [BRH-340]
+
+### Security
+
+- Fixed potential buffer overflow in native FFI when passing large string arrays to external functions. The vulnerability could allow arbitrary code execution (CVE-2025-1234)
+
+- Addressed timing attack vulnerability in the cryptography module's constant-time comparison function. The fix ensures that string comparison time is truly independent of content. Reported by Security Research Team at CyberGuard.
+
+### Deprecated
+
+- Deprecated the brush.concurrent module in favor of the new brush.async module. The old module will be removed in version 1.3. (#1910)
+
+- Deprecate `@unsafe` annotation which will be replaced with a more granular permission system in future versions. See src/compiler/annotations.br for details.
+
+- Dynamic imports using require() are now deprecated and will emit warnings. Use static import statements instead. (#1915)
+
+### Documentation
+
+- Updated language specification to include formal grammar for the new pattern matching syntax. The spec now includes detailed examples and edge cases. (#1920)
+
+- Improved documentation for error handling best practices, including new examples of using Result types with pattern matching. Fixed by Michael Wong <m.wong@brushlang.org>
+
+- Update documentation for async/await syntax, previous examples was using deprecated callback style

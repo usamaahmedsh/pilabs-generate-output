@@ -1,0 +1,178 @@
+# VERSION_1.2.md
+
+# Brush Language - Version 1.2.0 Release Notes
+
+Released: March 22, 2025
+
+## Overview
+
+We are pleased to announce the release of Brush Language version 1.2.0, representing six months of development focused on performance optimizations, language ergonomics, and ecosystem stability. This release introduces significant improvements to the type system, memory management, and developer tooling while maintaining backward compatibility with most 1.1.x codebases.
+
+Version 1.2.0 brings a 35% reduction in compile time for large projects and introduces several quality-of-life improvements requested by the community. We've also addressed 37 bugs and security vulnerabilities identified since the 1.1.0 release.
+
+## Highlights
+
+### Enhanced Type Inference System
+
+We're excited to introduce a completely revamped type inference engine that significantly reduces the need for explicit type annotations in complex code. The new bidirectional type checker can now resolve nested generic constraints and propagate type information through higher-order functions. This improvement allows for more concise yet type-safe code, particularly when working with the functional programming patterns that Brush excels at.
+
+```brush
+// Before (Brush 1.1)
+func mapValues<K, V, R>(map: Map<K, V>, transformer: func(V) -> R) -> Map<K, R> {
+    // implementation
+}
+
+// After (Brush 1.2) - Return type automatically inferred
+func mapValues<K, V, R>(map: Map<K, V>, transformer: func(V) -> R) {
+    // same implementation
+}
+```
+
+### Asynchronous Programming Model
+
+Version 1.2 introduces a comprehensive async/await programming model, allowing developers to write non-blocking code with synchronous-like syntax. The runtime scheduler has been enhanced with work-stealing algorithms to efficiently distribute tasks across available threads. This feature significantly simplifies code that previously required complex callback chains or promise-based patterns.
+
+```brush
+// New async/await syntax
+async func fetchUserData(id: String) -> UserProfile {
+    let response = await httpClient.get("/api/users/" + id)
+    let data = await response.json()
+    return UserProfile.fromJson(data)
+}
+```
+
+### Memory Management Improvements
+
+The garbage collector has been completely rewritten with a generational approach that reduces pause times by up to 87% in our benchmarks. The new memory manager features concurrent marking, incremental compaction, and adaptive collection frequency based on allocation patterns. Applications with large working sets will see the most significant improvements, with typical pause times under 1ms for heaps up to 1GB.
+
+### Pattern Matching Enhancements
+
+Pattern matching now supports destructuring of nested data structures, guard clauses, and binding of partial matches to variables. The compiler optimizes pattern match expressions into efficient jump tables when applicable. These improvements make pattern matching a more powerful tool for data transformation and control flow.
+
+### Standard Library Expansion
+
+The standard library has been expanded with 23 new modules, including `brush.net.http` for HTTP client/server implementations, `brush.data.json` for JSON parsing and serialization, and `brush.concurrency` for advanced threading primitives. The math library now includes support for complex numbers, quaternions, and common statistical operations.
+
+## Breaking Changes
+
+⚠️ **String Interpolation Syntax**: The string interpolation syntax has changed from `"Hello {name}"` to `"Hello ${name}"` for consistency with expression evaluation. A migration tool is available at `brush migrate string-interp <file>`.
+
+⚠️ **Module Import Resolution**: The module resolution algorithm now prioritizes local modules over global ones when names conflict. Projects that rely on shadowing global modules with local files may experience different import behavior.
+
+## Bug Fixes
+
+This release includes fixes for 22 bugs, including 3 critical security vulnerabilities. Highlights include resolution of memory leaks in the HTTP client, fixes for race conditions in the async runtime, and correction of type inference errors with recursive generic types. For a complete list of fixes, see CHANGELOG_1.2.md.
+
+## Performance Improvements
+
+- Compiler throughput improved by 35% for large projects through parallelized type checking
+- Runtime memory usage reduced by 22% through optimized data structure layouts
+- String operations are now 45% faster due to improved UTF-8 handling algorithms
+- JSON parsing performance increased by 60% with the new native parser implementation
+- Startup time reduced by 38% through lazy loading of standard library modules
+
+## Deprecation Notices
+
+The following features are deprecated in 1.2.0 and will be removed in version 2.0:
+
+- The `brush.compat` module for 1.0.x compatibility
+- Legacy callback-based async APIs (use async/await instead)
+- The `@unsafe` attribute for memory operations (replaced by the safer `@controlled` attribute)
+- Dynamic imports using the `import()` function (use the new `dynamic import` statement)
+
+## Installation & Upgrade
+
+Brush 1.2.0 can be installed using the standard package manager:
+
+```
+bpm install brush@1.2.0
+```
+
+Developers upgrading from 1.1.x should run the compatibility checker before upgrading:
+
+```
+brush compat-check --target 1.2.0
+```
+
+The migration tool can automatically update deprecated syntax patterns:
+
+```
+brush migrate --from 1.1 --to 1.2 <project_directory>
+```
+
+## Dependencies
+
+- Requires LLVM 16.0+ for compilation
+- Runtime compatible with glibc 2.31+ on Linux
+- Windows builds require Visual C++ Redistributable 2022+
+- Native extensions require Brush Extension SDK 1.2.0
+
+## Community Contributions
+
+Version 1.2.0 includes contributions from 47 community developers. Special thanks to the type system team led by Sarah Chen and the memory management improvements contributed by the University of Waterloo Systems Research Group.
+
+For a complete list of contributors, see the [Contributors](https://brushlang.org/contributors/1.2.0) page.
+
+---
+
+# CHANGELOG_1.2.md
+
+## [1.2.0] - 2025-03-22
+
+### Added
+
+- Added async/await syntax for asynchronous programming. The feature introduces new keywords and runtime support for non-blocking operations. (#1840)
+
+- Implemented pattern matching for nested data structures with guard clauses. Pattern matching now supports complex destructuring patterns and conditional matching based on arbitrary expressions. [BRH-342]
+
+- Add new `brush.net.http` module with client and server implementations. Module provides a high-level API for HTTP/1.1 and HTTP/2 protocols with TLS support. (fixes #1902)
+
+- New generational garbage collector with concurrent marking and incremental compaction. Thanks to Mike Torres <mtorres@brushlang.org> for leading this effort.
+
+### Changed
+
+- Changed string interpolation syntax from `{expr}` to `${expr}` for consistency with expression evaluation. Migration tool available. ⚠️ BREAKING CHANGE ⚠️ [BRH-401]
+
+- Update module resolution algorithm to prioritize local modules over global ones. This change affects projects with modules that shadow global names. (#1923)
+
+- Refactored the type inference engine to support bidirectional type checking. The new system can now resolve complex generic constraints without explicit annotations in most cases. [BRH-350]
+
+- Modified `Map` implementation to use open addressing instead of chaining, resulting in 27% better memory locality. Reported by John Smith <jsmith@email.com>
+
+### Fixed
+
+- Fix memory leak in HTTP client when connection is aborted during streaming response. The issue was in `ConnectionPool.releaseConnection()` not properly releasing socket resources. (fixes #1933)
+
+- Fixed compiler crash when using nested lambda expressions with closure capture. The issue occurred in `eval_context()` when scope resolution failed for shadowed variables (fixes #1847).
+
+- Resolved race condition in async runtime scheduler that caused deadlocks under high concurrency. The bug was in task queue management at brush.runtime.scheduler:203. (#1955)
+
+- Fixed incorrect type inference with recursive generic types, which previously resulted in error E0308. Reported by Emma Rodriguez <e.rodriguez@techcorp.io>
+
+- Fix SEGFAULT_0x7f in garbage collector during concurrent object allocation. The issue was in the mark-and-sweep phase when new objects were allocated during collection. [BRH-378]
+
+- Patched parser to handle unicode escape sequences in string literals correctly. Previously caused ERR_INVALID_TOKEN for certain UTF-16 surrogate pairs. (#1987)
+
+### Performance
+
+- Improved compiler throughput by 35% through parallelized type checking. The type checker now distributes work across multiple threads for large compilation units. [BRH-362]
+
+- Optimized string operations by implementing specialized UTF-8 handling algorithms, resulting in 45% faster string manipulation. Fixed by Sarah Chen <s.chen@brushlang.org>
+
+- Performance improvement in JSON parsing - now 60% faster through native implementation rather than the previous interpreted approach. (#1972)
+
+- Reduced startup time by 38% through lazy loading of standard library modules. Modules are now loaded on first use rather than at program initialization.
+
+### Security
+
+- Fixed buffer overflow vulnerability in `readBytes()` function when reading from untrusted input streams. The function now properly validates buffer sizes before reading. (CVE-2025-1234)
+
+- Addressed potential timing attack in the cryptography module's password comparison functions. Implementation now uses constant-time comparison algorithm. Reported by Security Team at BrushSec.
+
+### Documentation
+
+- Update documentation for async/await syntax, previous examples was using deprecated callback style. (#2001)
+
+- Completely rewrote the memory management guide with details on the new generational GC and how to optimize object lifecycles. [BRH-410]
+
+- Fixed incorrect examples in pattern matching documentation. Code samples now reflect the actual implementation in 1.2.0. Thanks to Priya Sharma for reporting.

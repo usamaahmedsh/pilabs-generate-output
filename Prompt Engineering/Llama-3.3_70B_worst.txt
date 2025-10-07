@@ -1,0 +1,69 @@
+**VERSION FILE (version 1.2)**
+
+Brush Language Specification
+=========================
+Version 1.2
+Release Date: 2023-02-15
+
+Introduction
+------------
+
+Brush is a modern, statically-typed programming language designed for building scalable and maintainable software systems. It is designed to be efficient, flexible, and easy to use, with a focus on simplicity and readability.
+
+Language Features
+----------------
+
+* Statically-typed with type inference
+* Object-oriented programming with classes, interfaces, and inheritance
+* Functional programming with higher-order functions and closures
+* Built-in support for concurrency and parallelism
+* Extensive standard library with support for file I/O, networking, and more
+
+Syntax
+------
+
+The Brush language syntax is designed to be easy to read and write, with a focus on simplicity and consistency. The language uses a syntax similar to other modern programming languages, with a few key differences.
+
+* Indentation is used to denote block-level structure, rather than curly braces or keywords
+* Semicolons are optional, and are only required in certain contexts
+* The language uses a consistent naming convention, with camelCase used for variable and function names
+
+Type System
+------------
+
+The Brush type system is based on a combination of static typing and type inference. The language uses a type system similar to other modern programming languages, with a few key differences.
+
+* The language uses a concept called "type classes" to define a set of types that can be used in a particular context
+* The language also uses a concept called "type inference" to automatically determine the types of variables and expressions
+
+Standard Library
+----------------
+
+The Brush standard library provides a wide range of functions and classes for performing common tasks, such as file I/O, networking, and data structures. The library is designed to be easy to use and extensible, with a focus on simplicity and consistency.
+
+* The library provides a set of built-in functions for working with files and directories, including `readFile`, `writeFile`, and `mkdir`
+* The library also provides a set of built-in functions for working with networks, including `tcpConnect`, `udpSend`, and `httpGet`
+
+Technical Details
+-----------------
+
+* The Brush compiler is written in C++ and uses a combination of recursive descent parsing and abstract syntax tree (AST) manipulation to generate machine code
+* The language uses a just-in-time (JIT) compiler to generate machine code at runtime, which provides a significant performance boost compared to interpreted languages
+* The language also uses a garbage collector to automatically manage memory and prevent memory leaks
+
+**CHANGELONG FILE (version 1.2)**
+
+Changelog
+=========
+
+Version 1.2
+Release Date: 2023-02-15
+
+* Fixed bug #123: incorrect handling of null pointer exceptions in the standard library
+* Added support for async/await syntax, allowing for easier writing of concurrent code
+* Improved performance of the JIT compiler by 15%
+* Added new `brush.lang` package for working with language-specific features, including syntax highlighting and code completion
+* Fixed bug #456: incorrect handling of type inference in certain contexts
+* Added new `brush.net` package for working with network sockets and protocols
+
+Note: This is a hypothetical example and not an actual programming language.

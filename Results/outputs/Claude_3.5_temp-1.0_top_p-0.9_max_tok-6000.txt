@@ -1,0 +1,160 @@
+# VERSION_1.2.md
+
+# Brush Language - Version 1.2.0 Release Notes
+
+Released: March 24, 2025
+
+## Overview
+
+Brush 1.2.0 represents a significant step forward in our language's evolution, focusing on performance optimization, developer ergonomics, and expanded platform support. This release addresses over 40 bugs reported by our growing community while introducing several new features that enhance the language's expressiveness and utility in production environments.
+
+We're excited to introduce a completely redesigned asynchronous programming model, bringing Brush more in line with modern concurrency patterns found in other popular languages. Additionally, version 1.2 delivers substantial performance improvements across the entire runtime, with particular focus on memory management and string operations.
+
+## Highlights
+
+### Redesigned Asynchronous Programming Model
+
+Version 1.2 introduces a new `async/await` syntax that replaces the previous callback-based approach to asynchronous programming. The compiler now transforms async functions into state machines at compile time, resulting in more readable code and improved performance. Developers can use the familiar try/catch pattern with async operations, eliminating "callback hell" in complex asynchronous workflows.
+
+```brush
+async fn fetchData(url: String) -> Result<Data, Error> {
+    let response = await httpClient.get(url);
+    let data = await response.json();
+    return Ok(data);
+}
+```
+
+### Enhanced Type Inference
+
+The type system now features significantly improved inference capabilities, reducing the need for explicit type annotations by approximately 30%. The compiler implements bidirectional type checking during constraint resolution, allowing it to correctly infer types in complex scenarios involving higher-order functions and generics. This improvement is particularly noticeable when working with functional programming patterns.
+
+### Native Binary Generation
+
+Brush now supports direct compilation to native executables without requiring an intermediate VM. The new `brush compile --native` command leverages LLVM 16.0+ to generate optimized binaries for x86_64 and ARM64 architectures. Initial benchmarks show a 25-40% performance improvement for compute-intensive tasks compared to the VM execution mode.
+
+### Interactive REPL Enhancements
+
+The Brush REPL (`brush repl`) has been completely rewritten with multiline editing support, syntax highlighting, and improved auto-completion. The new REPL includes a `.save` command for exporting session code and a `.explain` command that displays AST visualization for educational purposes. This makes the REPL significantly more useful for both learning and rapid prototyping.
+
+### Extended Standard Library
+
+The standard library has been expanded with new modules for cryptography (`brush.crypto`), advanced data structures (`brush.collections.concurrent`), and improved filesystem operations (`brush.io.fs`). The new `brush.time` module provides a comprehensive API for time and date operations with timezone support.
+
+## Breaking Changes
+
+⚠️ **String Encoding Change**: The default string encoding has changed from UTF-8 to UTF-16 for better Windows compatibility and Unicode support. Code that relies on byte-level string operations may need adjustment. See migration guide in `docs/migration/1.1-to-1.2.md`.
+
+⚠️ **Module Resolution**: The module resolution algorithm has been updated to prioritize local project modules over global ones. Projects that relied on implicit global module shadowing will need to explicitly import global modules with the new `@global` prefix syntax.
+
+## Performance Improvements
+
+Version 1.2 brings significant performance enhancements across the board:
+
+- **Garbage Collection**: The redesigned garbage collector reduces pause times by 60% through concurrent marking and incremental sweeping.
+- **String Operations**: String concatenation and interpolation are now 35% faster through the use of rope data structures for large strings.
+- **Compiler Optimization**: Compilation speed has improved by 20% for large projects, with a 15% reduction in memory usage during compilation.
+- **Runtime Memory**: Overall runtime memory footprint has been reduced from 8.4MB to 5.7MB through better memory layout and reduced metadata overhead.
+
+## Bug Fixes
+
+Version 1.2 addresses 42 bugs reported since the 1.1 release, including critical fixes for memory leaks, compiler crashes, and type system inconsistencies. Notable fixes include resolution of the long-standing issue with generic type inference in recursive functions and elimination of memory leaks in the event loop. For a complete list of fixes, see `CHANGELOG_1.2.md`.
+
+## Deprecation Notices
+
+The following features are deprecated in 1.2 and will be removed in version 1.3:
+
+- The `brush.async.callback` module is deprecated in favor of the new `async/await` syntax.
+- The `--legacy-gc` flag will be removed as the new garbage collector is now stable.
+- The `unsafe.pointerCast()` function is deprecated in favor of the safer `unsafe.pointerAs<T>()` generic function.
+
+## Installation & Upgrade
+
+Brush 1.2 is compatible with 1.1.x modules, but code using deprecated features may generate warnings. Upgrade using your package manager:
+
+```
+npm install -g brushlang@1.2.0
+```
+
+Or download directly from our website:
+
+```
+curl -sSL https://brushlang.org/install.sh | sh -s -- --version 1.2.0
+```
+
+Developers upgrading from 1.1.x should review the migration guide at `docs/migration/1.1-to-1.2.md`, particularly if their code uses the async callback pattern or relies on specific string encoding behaviors.
+
+## Dependencies
+
+- Requires LLVM 16.0+ for native compilation (optional)
+- Compatible with GCC 11+ and Clang 14+
+- Node.js 18.0+ for brushlang npm package
+
+## Community Contributions
+
+This release includes contributions from 28 community members, with significant work on the new async/await implementation, standard library extensions, and performance optimizations. We extend our thanks to all contributors, especially the participants in our 2024 Winter Hackathon who drove many of the REPL improvements.
+
+---
+
+# CHANGELOG_1.2.md
+
+## [1.2.0] - 2025-03-24
+
+### Added
+
+- Added new async/await syntax for simplified asynchronous programming. The compiler now transforms async functions into state machines at compile time. (#1840)
+
+- Implemented native binary compilation support using LLVM backend. Use `brush compile --native` to generate optimized native executables for x86_64 and ARM64 architectures. [BRH-290]
+
+- Added new `brush.crypto` module with implementations for common hashing algorithms and encryption utilities. Thanks to Alex Wang <a.wang@cryptosec.org> for significant contributions.
+
+- Implemented multiline editing, syntax highlighting, and improved auto-completion in REPL. The new `.explain` command visualizes AST for educational purposes. (#1862)
+
+- Add new `brush.time` module with comprehensive timezone support and ISO8601 parsing capabilities. (fixes #1756)
+
+### Changed
+
+- Changed default string encoding from UTF-8 to UTF-16 for improved Windows compatibility and Unicode support. ⚠️ This is a breaking change for code relying on byte-level string operations. [BRH-301]
+
+- Update module resolution to prioritize local project modules over global ones. Projects using implicit global module shadowing need to use the new `@global` prefix syntax. (#1875)
+
+- Redesigned the garbage collector to use concurrent marking and incremental sweeping, reducing GC pause times by approximately 60%. [BRH-310]
+
+- Modified string concatenation to use rope data structures for large strings, resulting in 35% faster string operations. Reported by Jamie Kowalski <jkowalski@performant.io>
+
+### Fixed
+
+- Fixed compiler crash when using nested lambda expressions with closure capture. The issue occurred in `eval_context()` when scope resolution failed for shadowed variables (fixes #1847).
+
+- Fix memory leak in event loop when using timers with circular references. The leak was happening at `event_loop.c:234` when timer callbacks held references to their parent context. [BRH-312]
+
+- Resolved SEGFAULT in garbage collector during concurrent object allocation. The issue was traced to a race condition in `gc_collect()` when marking was interrupted. Reported by Emma Rodriguez <e.rodriguez@techcorp.io>
+
+- Fixed incorrect type inference in recursive generic functions. Error E0308 would incorrectly trigger when a recursive call involved complex generic types. (#1901)
+
+- Fix parsing error for string literals containing escaped Unicode code points. Parser would fail with ERR_INVALID_TOKEN when string contained `\u{10FFFF}` format escapes. (#1910)
+
+- Resolved issue where `import` statements within conditional blocks were sometimes ignored by the module loader at `src/compiler/module.br:312`. Thanks to Raj Patel for reporting.
+
+### Performance
+
+- Performance improvement in string interpolation - now 23% faster for strings with 10+ variables. This was achieved by pre-allocating buffer space based on initial string analysis. (#1892)
+
+- Reduced compiler memory usage by 15% during type checking phase through more efficient constraint representation. [BRH-320]
+
+- Optimized `Map` and `Set` implementations for faster lookups with large collections (>10K elements). Benchmarks show 30% improvement for typical workloads. Reported by Lin Wei <l.wei@datastruct.net>
+
+### Documentation
+
+- Update documentation for async/await syntax, previous examples was using deprecated callback style. See `docs/async-programming.md` for new best practices.
+
+- Completely rewrote the "Memory Management" chapter in the language guide with new diagrams explaining the concurrent GC algorithm. (#1934)
+
+- Fixed broken links and outdated information in the standard library reference. Error was occurring at `docs/generator.js:87` when processing `brush.collections` module. Fixed by Sarah Chen <s.chen@brushlang.org>
+
+### Deprecated
+
+- Deprecated the `brush.async.callback` module in favor of the new `async/await` syntax. It will be removed in version 1.3. [BRH-350]
+
+- Deprecate `--legacy-gc` flag as the new garbage collector is now stable and offers better performance in all scenarios. (#1950)
+
+- The `unsafe.pointerCast()` function is deprecated and will be removed in 1.3. Use the safer `unsafe.pointerAs<T>()` generic function instead.

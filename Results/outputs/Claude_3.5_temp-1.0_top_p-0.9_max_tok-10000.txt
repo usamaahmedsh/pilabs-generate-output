@@ -1,0 +1,158 @@
+# VERSION_1.2.md
+
+# Brush Language - Version 1.2.0 Release Notes
+
+Released: March 8, 2025
+
+## Overview
+
+Brush Language 1.2.0 represents a significant milestone in our language evolution, focusing on performance improvements, enhanced type safety, and developer productivity. This release addresses over 40 reported issues while introducing several powerful new features that expand the language's capabilities.
+
+We're excited to introduce the new async/await pattern, bringing modern concurrency support to Brush with native syntax that makes asynchronous programming both intuitive and efficient. Version 1.2 also delivers substantial performance enhancements across the runtime, with particular attention to memory management and string operations.
+
+## Highlights
+
+### Async/Await Pattern
+
+Brush now supports first-class async/await syntax for handling asynchronous operations without callback chains. The implementation leverages a lightweight task scheduler in the runtime that minimizes context switching overhead. This feature makes concurrent programming significantly more readable while maintaining the performance characteristics Brush developers expect.
+
+```brush
+async fn fetchData(url: string) -> Result<JSON> {
+    let response = await http.get(url);
+    return json.parse(response.body);
+}
+```
+
+### Enhanced Type Inference System
+
+Version 1.2 introduces improved type inference for generic functions, reducing the need for explicit type annotations by up to 80% in complex code. The compiler now performs bidirectional type checking during constraint resolution, allowing it to correctly infer types in previously ambiguous contexts. This enhancement is particularly valuable when working with higher-order functions and complex data structures.
+
+### Pattern Matching on Algebraic Data Types
+
+Pattern matching has been extended to work with algebraic data types, enabling more expressive and safer code when working with complex data structures. The compiler now performs exhaustiveness checking to ensure all possible variants are handled, preventing runtime errors. This feature integrates seamlessly with the existing match expression syntax.
+
+```brush
+match result {
+    Ok(value) => processValue(value),
+    Err(NetworkError(code)) => retryRequest(code),
+    Err(ParseError(msg)) => logError("Parse failure: {msg}"),
+    Err(_) => fallback(),
+}
+```
+
+### Interactive Debugger Integration
+
+Brush now ships with a protocol-compliant debug adapter that integrates with major IDEs and editor extensions. The debugger supports breakpoints, variable inspection, conditional breaks, and expression evaluation. Developers can now step through Brush code, inspect variable state, and evaluate expressions at runtime without leaving their development environment.
+
+### String Interpolation Performance
+
+String interpolation operations are now 42% faster due to a redesigned implementation that pre-allocates memory based on compile-time analysis of string templates. The new implementation also reduces heap fragmentation during string construction, improving overall application performance.
+
+## Breaking Changes
+
+⚠️ **String Encoding Change**: The default string encoding has changed from UTF-8 to UTF-16 for better cross-platform compatibility. Code that relies on byte-level string operations or makes assumptions about character encoding may need adjustment. See migration guide in docs/migration/1.1-to-1.2.md.
+
+⚠️ **Module Import Behavior**: The module resolution algorithm now prioritizes local modules over standard library modules with the same name. This change improves predictability but may affect applications that rely on implicit standard library imports. Use fully qualified paths to ensure the correct module is imported.
+
+## Bug Fixes
+
+Version 1.2 resolves 27 reported bugs, including several critical issues related to memory management, concurrency, and type checking. Notable fixes include resolution of a garbage collection issue during concurrent object allocation and correction of type inference failures with nested generics. For a complete list of fixes, see CHANGELOG_1.2.md.
+
+## Performance Improvements
+
+- **Compiler throughput**: Overall compilation speed improved by 23% through optimized parsing and type checking algorithms.
+- **Runtime memory usage**: Heap memory consumption reduced by 18% through more efficient object representation and improved garbage collection heuristics.
+- **String operations**: String manipulation operations (concatenation, interpolation, splitting) now 30-42% faster.
+- **Standard library**: Core data structures (Map, Set, Vector) now have O(1) operations where previously O(log n).
+
+## Deprecation Notices
+
+The following features are deprecated in 1.2 and will be removed in version 1.3:
+
+- The `callback()` function for asynchronous operations is deprecated in favor of async/await syntax
+- Legacy `format()` string formatting is deprecated in favor of string interpolation
+- The `unsafe_cast()` function is deprecated in favor of the new type-safe `try_cast()` function
+
+## Installation & Upgrade
+
+Brush 1.2.0 is compatible with modules compiled for Brush 1.1.x, but recompilation is recommended to take advantage of performance improvements. Developers upgrading from 1.0.x should consult the migration guide as some APIs have changed.
+
+To install:
+```
+brew install brush@1.2    # macOS
+apt install brush-lang    # Debian/Ubuntu
+brush update --version=1.2.0  # Existing installations
+```
+
+## Dependencies
+
+- Requires LLVM 16.0+ for optimal performance
+- Compatible with GCC 12+ and Clang 14+
+- Runtime footprint reduced from 7.8MB to 5.4MB
+- Standard library now ships with optional bindings for SQLite 3.40.0 and OpenSSL 3.0.8
+
+## Acknowledgements
+
+This release would not have been possible without contributions from our growing community. Special thanks to the 32 contributors who submitted patches, reported issues, and improved documentation. See CONTRIBUTORS.md for a complete list of individuals who helped make Brush 1.2.0 possible.
+
+For more information, please visit https://brushlang.org/docs/1.2/
+
+---
+
+# CHANGELOG_1.2.md
+
+## [1.2.0] - 2025-03-08
+
+### Added
+
+- Added async/await syntax for asynchronous programming. New keywords and runtime support enable writing non-blocking code without callback chains (#1845)
+
+- Implemented pattern matching for algebraic data types with exhaustiveness checking. The compiler now verifies that all possible variants are handled at compile-time [BRH-312]
+
+- Added interactive debugger protocol support for IDE integration. Supports breakpoints, variable inspection, and expression evaluation. Thanks to Mia Johnson <m.johnson@brushlang.org>
+
+- New `try_cast()` function provides type-safe casting with proper error handling rather than runtime exceptions (#1862)
+
+### Changed
+
+- Changed default string encoding from UTF-8 to UTF-16 for better cross-platform compatibility. ⚠️ This is a breaking change that may affect byte-level operations. (fixes #1704)
+
+- Update module resolution algorithm to prioritize local modules over standard library modules with identical names. Reported by Alex Wei <alex.wei@devfirm.co>
+
+- Rewrote string interpolation engine for better performance and memory usage. String templates now use 32% less memory and execute 42% faster [BRH-289]
+
+- Modified `Token.IDENTIFIER` handling in the parser to support Unicode identifiers in source code (fixes #1901)
+
+### Fixed
+
+- Fixed compiler crash when using nested lambda expressions with closure capture. The issue occurred in `eval_context()` when scope resolution failed for shadowed variables (fixes #1847)
+
+- Resolved SEGFAULT in garbage collector during concurrent object allocation. Error occurred at brush.runtime.gc_collect:142 when finalizers ran in incorrect order. Reported by Emma Rodriguez <e.rodriguez@techcorp.io>
+
+- Fix type inference failure with deeply nested generic types. The type checker would incorrectly unify type variables in certain recursive contexts (ERR_TYPE_UNIFICATION)
+
+- Fixed memory leak in the HTTP client library when connections were aborted mid-request. Resources were not properly released in src/stdlib/net/http.brush. Thanks to David Park for reporting
+
+- Patched race condition in concurrent Map implementation that could cause data corruption under high contention. The issue was in the rehashing algorithm at brush.collections.ConcurrentMap:405 [BRH-331]
+
+### Performance
+
+- Improved compiler throughput by 23% through optimized parsing and type checking algorithms. Most noticeable when compiling projects with 100+ modules
+
+- Reduced heap memory consumption by 18% through more efficient object representation. Objects now use a more compact memory layout with optimized field alignment
+
+- Optimized standard library collections (Map, Set, Vector) to provide O(1) operations where previously O(log n). Implementation now uses open addressing with linear probing
+
+### Security
+
+- Fixed potential buffer overflow in parseExpression() when handling extremely long string literals. This could be exploited to execute arbitrary code (CVE-2025-0842)
+
+- Update bundled OpenSSL bindings to version 3.0.8 to address security vulnerabilities. Previous versions were susceptible to SEGFAULT_0x7f when handling malformed certificates
+
+### Documentation
+
+- Update documentation for async/await syntax, previous examples was using deprecated callback style
+
+- Expanded developer guide with sections on debugging, profiling, and performance optimization. Now includes benchmark comparison methodology
+
+- Fixed incorrect examples in algebraic data types documentation. Previous code samples didn't account for exhaustiveness checking requirements

@@ -1,0 +1,72 @@
+**CHANGELOG_1.2.md**
+[1.2.0] - 2023-02-15
+
+### Added
+* Added support for asynchronous programming using the `async` and `await` keywords, thanks to contributor John Doe <johndoe@example.com> (#1234)
+* New `brush.lang` module for language-level functionality, including the `parse` function for parsing Brush code
+* Updated the `std.io` module to include the `readLine` function for reading input from the console
+
+### Fixed
+* Fix for issue [BRH-567] where the `compile` function would throw an error with code 42 when encountering invalid syntax
+* Resolved a bug in the `brush.compiler` module where the `compile` function would not properly handle recursive function calls
+* Fixed a typo in the `brush.docs` module where the `README.md` file was not being generated correctly
+
+### Changed
+* Update the `brush.runtime` module to use a new memory management system, reducing memory usage by 30%
+* Changed the `std.math` module to use a more accurate algorithm for calculating pi, thanks to contributor Jane Smith <janesmith@example.com> (#9012)
+* The `brush.compiler` module now uses a more efficient parsing algorithm, resulting in a 25% increase in compilation speed
+
+### Security
+* Fix for a security vulnerability in the `std.net` module where an attacker could potentially execute arbitrary code, thanks to contributor Bob Johnson <bobjohnson@example.com> (#1111)
+* Updated the `brush.crypto` module to use a more secure encryption algorithm
+
+### Performance
+* Optimized the `brush.vm` module to reduce execution time by 40% for certain workloads
+* Update the `std.db` module to use a more efficient database query algorithm, resulting in a 50% increase in query speed
+
+### Documentation
+* Updated the `brush.docs` module to include more detailed documentation for the `std` module, thanks to contributor Alice Brown <alicebrown@example.com> (#2345)
+* Fix for a minor typo in the `README.md` file where the link to the Brush website was incorrect
+
+**VERSION_1.2.md**
+# Brush Language - Version 1.2.0 Release Notes
+## Overview
+We are excited to announce the release of Brush 1.2.0, which includes a number of significant improvements and new features. This release includes major updates to the `brush.lang` and `std.io` modules, as well as numerous bug fixes and performance improvements.
+
+## Highlights
+* Asynchronous programming support using the `async` and `await` keywords, making it easier to write concurrent code
+* New `brush.lang` module for language-level functionality, including the `parse` function for parsing Brush code
+* Improved performance and memory usage in the `brush.runtime` module
+
+## Breaking Changes
+* The `brush.compiler` module now uses a new parsing algorithm, which may break certain code that relies on the old algorithm. See the [migration notes](#migration-notes) for more information.
+
+## Bug Fixes
+* A number of bug fixes are included in this release, including fixes for issues [BRH-567] and [BRH-901]. For a full list of bug fixes, see the [CHANGELOG_1.2.md](CHANGELOG_1.2.md) file.
+
+## Performance Improvements
+* The `brush.vm` module has been optimized to reduce execution time by 40% for certain workloads
+* The `std.db` module now uses a more efficient database query algorithm, resulting in a 50% increase in query speed
+```brush
+// example of using the new async/await syntax
+async function main() {
+  const data = await readLine();
+  console.log(data);
+}
+```
+## Dependencies
+* The `brush.crypto` module now depends on the `openssl` library version 1.1.1 or later
+* The `std.net` module now depends on the `curl` library version 7.64.0 or later
+
+## Migration Notes
+* If you are upgrading from a previous version of Brush, you may need to update your code to use the new parsing algorithm in the `brush.compiler` module. See the [CHANGELOG_1.2.md](CHANGELOG_1.2.md) file for more information on the changes made in this release.
+* The `brush.lang` module is now required for all Brush programs, so you will need to add it to your imports if you haven't already.
+```brush
+// example of using the new brush.lang module
+import { parse } from 'brush.lang';
+
+const code = 'console.log("Hello, World!");';
+const ast = parse(code);
+console.log(ast);
+```
+Note: The release date is February 15, 2023. Please see the [CHANGELOG_1.2.md](CHANGELOG_1.2.md) file for a full list of changes and bug fixes.

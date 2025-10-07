@@ -1,0 +1,100 @@
+# VERSION_1.2.md
+
+# Brush Language - Version 1.2.0 Release Notes
+
+**Release Date:** November 15, 2023
+
+## Overview
+
+Brush 1.2.0 represents a significant milestone in our language's evolution, focusing on performance optimizations, expanded standard library capabilities, and improved developer experience. This release introduces pattern matching for collections, enhanced asynchronous operations, and substantial improvements to the type system. We've also addressed numerous bugs reported by our growing community and optimized the compiler for faster build times.
+
+## Highlights
+
+### Pattern Matching for Collections
+
+Brush now supports comprehensive pattern matching for all collection types, allowing for more expressive and concise code when working with arrays, maps, and sets. This powerful feature enables destructuring and conditional logic in a single expression:
+
+```brush
+match collection {
+    [first, second, *rest] if first > 10 => {
+        process(first, second);
+        for item in rest { log(item); }
+    },
+    {key: "important", value} => handleImportant(value),
+    _ => defaultHandler()
+}
+```
+
+The pattern matching engine has been optimized to generate efficient bytecode, resulting in negligible runtime overhead compared to equivalent conditional structures.
+
+### Improved Asynchronous Programming Model
+
+We've completely revamped the asynchronous programming model with the introduction of the `async` and `await` keywords, along with the new `Future<T>` type. This replaces the previous callback-based approach and significantly improves readability of asynchronous code:
+
+```brush
+async fn fetchUserData(userId: String) -> Future<UserData> {
+    let response = await api.request("/users/" + userId);
+    return UserData.fromJson(response.body);
+}
+
+// Usage
+let userData = await fetchUserData("user123");
+```
+
+The async runtime has been optimized to minimize overhead, with context switching now 35% faster than in version 1.1.
+
+### Type System Enhancements
+
+The type system now supports generic type constraints using the `where` clause, allowing for more precise type specifications:
+
+```brush
+fn sortCollection<T, C>(collection: C) -> C 
+    where C: Collection<T>, 
+          T: Comparable {
+    // Implementation
+}
+```
+
+Additionally, we've introduced union types with the `|` operator, enabling more flexible type definitions while maintaining type safety:
+
+```brush
+fn processInput(input: String | Number | Boolean) {
+    // Type-safe handling of multiple input types
+}
+```
+
+## Breaking Changes
+
+### Removal of Deprecated APIs
+
+Several APIs that were marked as deprecated in version 1.0 and 1.1 have been removed:
+
+- The `old_format()` function has been removed from the `std::formatting` module. Use `format()` instead.
+- The `LegacyCollection` trait has been removed. Migrate to the `Collection` trait.
+- The `--legacy-compiler` flag is no longer supported. All projects must use the new compiler infrastructure.
+
+### Changed Default Behaviors
+
+- The default floating-point precision in string formatting has changed from 6 to 15 digits to better represent modern hardware capabilities.
+- Error handling in the standard library now uses the Result type consistently instead of throwing exceptions in some cases.
+
+## Migration Guide
+
+To migrate from Brush 1.1.x to 1.2.0:
+
+1. Replace any usage of `old_format()` with `format()`, noting that the parameter order has changed.
+2. Update implementations of `LegacyCollection` to implement `Collection` instead.
+3. Review any code that relies on specific floating-point string representations.
+4. Replace exception handling with Result handling for standard library functions.
+
+For projects using the compiler API, refer to the updated documentation at [docs.brushlang.org/compiler-api/1.2](https://docs.brushlang.org/compiler-api/1.2).
+
+## Bug Fixes
+
+We've addressed 27 bugs in this release, including critical fixes for memory management, compiler optimizations, and standard library functions. See the [CHANGELOG_1.2.md](CHANGELOG_1.2.md) for a complete list of fixes.
+
+Notable fixes include:
+
+- Fixed a memory leak in the `HashMap` implementation that could occur during rehashing operations.
+- Resolved a compiler crash when processing complex generic type constraints.
+- Fixe

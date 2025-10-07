@@ -1,0 +1,98 @@
+```markdown
+# Brush Language - Version 1.2.0 Release Notes
+Released: January 15, 2025
+
+## Overview
+
+Version 1.2 of the Brush programming language brings a range of exciting new features, performance enhancements, and critical bug fixes. This update underscores our commitment to improving the developer experience by introducing more intuitive syntax, optimizing runtime efficiency, and ensuring the robustness of the language's core components. Developers can now take advantage of an improved type system, a more powerful standard library, and enhanced concurrency support.
+
+This release focuses on making Brush more accessible and performant. With key improvements in error handling and memory management, users will experience a smoother development process and faster execution of Brush applications. We’re excited to introduce these changes and look forward to your feedback on this version.
+
+## Highlights
+
+### Enhanced Type Inference System
+
+Version 1.2 introduces an improved type inference system, significantly reducing the need for explicit type annotations. The compiler now employs bidirectional type checking during the constraint resolution phase, enabling it to deduce complex types from the context. This enhancement is particularly beneficial for functional programming patterns involving higher-order functions and closures.
+
+### Expanded Standard Library
+
+The standard library has been expanded to include new modules for networking and file I/O. The `std.net` module provides robust support for HTTP requests, while `std.fs` offers enhanced file manipulation capabilities. These additions allow developers to write more comprehensive applications using native Brush constructs.
+
+### Enhanced Concurrency Support
+
+Concurrency in Brush has been improved with the introduction of the `brush.async.timeout(duration: int, callback: fn)` function. This feature allows developers to specify timeouts for asynchronous operations, improving control over long-running tasks. The underlying mechanism leverages the event loop for efficient task scheduling, ensuring minimal performance overhead.
+
+### Performance Optimizations
+
+This release includes several performance optimizations, resulting in a 15% reduction in compile time and a 40% smaller binary size. These improvements have been achieved by optimizing the Abstract Syntax Tree (AST) traversal and enhancing the memory allocation strategies within the runtime.
+
+### Improved Error Handling
+
+Error messages in Brush have been overhauled to provide more detailed and actionable information. The updated error reporting system includes context-specific suggestions and clearer stack traces, making it easier for developers to diagnose and fix issues.
+
+## ⚠️ Breaking Changes
+
+- **String Encoding Change**: The default string encoding has been changed from UTF-8 to UTF-16 for enhanced compatibility with Windows systems. Existing code that relies on byte-level string operations may require adjustments. Developers upgrading from 1.1.x should refer to the migration guide in `docs/migration/1.1-to-1.2.md` for detailed instructions.
+
+## Bug Fixes
+
+For a complete list of bug fixes, please see CHANGELOG_1.2.md. Notable fixes include resolution of memory leaks, improved error handling in the lexer, and stability enhancements in the garbage collector.
+
+## Performance Improvements
+
+- Runtime footprint has been reduced from 8MB to 5.2MB.
+- Improved string interpolation performance, now 23% faster for strings with 10+ variables.
+
+## Deprecation Notices
+
+The `old_network` module is deprecated and will be removed in a future release. Developers are encouraged to transition to the new `std.net` module for improved functionality and performance.
+
+## Installation & Upgrade
+
+To upgrade to Brush 1.2, download the latest release from the official repository and follow the installation instructions provided in the documentation. Ensure that your environment is compatible with LLVM 15.0+ and GCC 11+ to take full advantage of the new features.
+
+## Dependencies
+
+- Requires LLVM 15.0+
+- Compatible with GCC 11+
+- Updated standard library to version 2.3.0
+
+---
+
+# CHANGELOG_1.2.md
+## [1.2.0] - 2025-01-15
+
+### Added
+
+- Introduced the `std.net` module for network operations, including HTTP requests and socket management. This addition broadens Brush's standard library capabilities (#1902).
+- Added `brush.async.timeout(duration: int, callback: fn)` for better control over asynchronous tasks, allowing developers to specify operation timeouts (#1910).
+
+### Changed
+
+- Modified default string encoding from UTF-8 to UTF-16, impacting byte-level operations in existing applications (#1925).
+- Updated error handling to include context-specific suggestions and improve developer feedback. Now includes error codes like E0308 for easier troubleshooting (Reported by John Smith <jsmith@email.com>).
+
+### Fixed
+
+- Resolved memory leak in the garbage collector during concurrent object allocation. The issue was causing increased memory usage over time (fixes #203).
+- Fixed compiler crash when using nested lambda expressions with closure capture. The crash occurred in `eval_context()` when scope resolution failed for shadowed variables (fixes #1847).
+- Addressed SEGFAULT_0x7f error in the runtime environment when handling large recursive functions. The stack trace pointed to brush.runtime.eval:142 (Thanks to Mike Torres for reporting).
+
+### Performance
+
+- Improved string interpolation, now 23% faster for strings with 10+ variables (#2301).
+- Optimized AST traversal for a 15% reduction in compile time and reduced binary size by 40% (#1950).
+
+### Deprecated
+
+- Deprecated `old_network` module. Users should transition to `std.net` for better support and functionality (#1940).
+
+### Documentation
+
+- Update documentation for async/await syntax, previous examples was using deprecated callback style (Reported by Sarah Chen <s.chen@brushlang.org>).
+- Clarified usage examples in `stdlib/io.brush` to reflect recent API changes (fixes #1888).
+
+### Security
+
+- Patched a vulnerability in the lexer module that could allow injection attacks via crafted token streams. Token.IDENTIFIER validation has been tightened (fixes #1845).
+```

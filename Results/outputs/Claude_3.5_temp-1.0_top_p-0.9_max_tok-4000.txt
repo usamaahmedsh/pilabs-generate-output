@@ -1,0 +1,145 @@
+# VERSION_1.2.md
+
+# Brush Language - Version 1.2.0 Release Notes
+
+Released: March 17, 2025
+
+## Overview
+
+Brush 1.2.0 represents a significant milestone in the language's evolution, bringing substantial improvements to the type system, performance optimizations, and developer experience enhancements. This release focuses on making Brush more robust for production environments while maintaining the expressive syntax that developers have come to appreciate.
+
+After six months of development and testing across 287 pull requests, we're excited to introduce a more mature and capable Brush that addresses many of the community's most requested features. Version 1.2 also lays the groundwork for the upcoming package management system planned for version 1.3.
+
+## Highlights
+
+### Advanced Pattern Matching
+
+Version 1.2 introduces comprehensive pattern matching capabilities, allowing for more expressive and safer code when handling complex data structures. The pattern matching engine now supports destructuring of nested objects, conditional patterns with guard clauses, and exhaustiveness checking at compile time. This feature dramatically reduces boilerplate code when working with variant types and error handling scenarios.
+
+```brush
+match response {
+  HttpResponse(200, body: {data, metadata}) => processData(data, metadata),
+  HttpResponse(code: 400..499, _) => handleClientError(code),
+  HttpResponse(500.., _) when retries < MAX_RETRIES => retryRequest(),
+  _ => throw UnexpectedResponseError()
+}
+```
+
+### Async/Await Workflow
+
+We're excited to introduce first-class async/await support in Brush 1.2. The new concurrency model provides a simpler, more intuitive way to write asynchronous code without callback hell or complex promise chains. The runtime efficiently manages asynchronous tasks using a work-stealing scheduler that maximizes CPU utilization while minimizing context switching overhead. This implementation achieves up to 30% better throughput compared to the previous callback-based approach.
+
+```brush
+async fn fetchUserData(userId: String) -> Result<UserProfile, ApiError> {
+  let response = await api.get(`/users/${userId}`);
+  if !response.ok {
+    return Err(ApiError.fromResponse(response));
+  }
+  return Ok(UserProfile.fromJson(await response.json()));
+}
+```
+
+### Gradual Type System Improvements
+
+Brush 1.2 enhances the gradual type system with more powerful type inference, union types, and refined nullable handling. The type checker now performs bidirectional type checking during constraint resolution, allowing it to infer complex generic types from context with minimal annotations. This improvement is particularly valuable when working with higher-order functions and functional programming patterns, reducing type annotation boilerplate by approximately 40% in typical codebases.
+
+### Memory Management Optimizations
+
+This release includes a completely rewritten garbage collector that reduces pause times by 65% through incremental collection and generational heap management. The new GC algorithm uses a tri-color marking approach with write barriers to minimize the impact on application performance. Memory overhead has been reduced from 8MB to 5.2MB for typical applications, making Brush more suitable for resource-constrained environments.
+
+### Compiler Performance
+
+Compilation speed has been improved by 28% on average through parallel parsing, more efficient type checking, and optimized IR generation. Large projects with 100K+ lines of code now compile in seconds rather than minutes. The compiler now leverages multiple cores more effectively during all compilation phases and implements smarter dependency tracking to minimize unnecessary recompilation.
+
+## Breaking Changes
+
+⚠️ **Module Import Syntax**: The import syntax has changed to better support the upcoming package manager. The old dot notation (`import std.collections.HashMap`) is now deprecated in favor of the new path-based syntax (`import std/collections/HashMap`). A migration tool is available via `brush migrate imports`.
+
+⚠️ **String Interpolation**: String interpolation now requires variables to be prefixed with a dollar sign for consistency and clarity. For example, `"Hello {name}"` should be changed to `"Hello ${name}"`. The previous syntax will trigger deprecation warnings in 1.2 and will be removed in version 1.3.
+
+⚠️ **Error Handling API**: The `try` and `catch` keywords have been replaced with the more comprehensive `Result<T, E>` type and pattern matching. See migration guide in docs/migration/error_handling.md for detailed examples of how to update your code.
+
+## Bug Fixes
+
+Version 1.2 includes fixes for over 45 bugs, including critical issues affecting memory safety, concurrency, and compiler correctness. Notable improvements include resolving several race conditions in the async runtime, fixing memory leaks in the closure implementation, and addressing parser edge cases with nested generics.
+
+For a complete list of fixes, see CHANGELOG_1.2.md or issues #1840-#1891 in the issue tracker.
+
+## Performance Improvements
+
+- **Startup Time**: Application startup time reduced by 35% through lazy loading of standard library components.
+- **Memory Usage**: Runtime footprint reduced from 8MB to 5.2MB through more efficient data structures and smarter memory allocation.
+- **String Operations**: String manipulation is now 42% faster due to optimized UTF-8 handling and improved memory layout.
+- **Concurrency**: The new work-stealing scheduler achieves up to 3x better throughput for IO-bound workloads compared to version 1.1.
+
+## Deprecation Notices
+
+The following features are deprecated in Brush 1.2 and will be removed in version 1.3:
+
+- The `callback` parameter in `setTimeout` and `setInterval` functions (use async/await instead)
+- The `old_import` compiler flag (migration to new import syntax is required)
+- Legacy error handling via `try/catch` blocks (use `Result<T, E>` pattern)
+- The `--compat-1.0` compiler flag (1.0 compatibility mode will not be maintained)
+
+## Installation & Upgrade
+
+Brush 1.2 is compatible with 1.1.x modules but requires recompilation due to internal ABI changes. To upgrade:
+
+```bash
+brush update --version 1.2.0
+brush build --rebuild-all
+```
+
+Developers upgrading from 1.1.x should note that the new module resolution system may affect projects with non-standard directory structures. Use the `--module-path` flag if encountering import errors after upgrading.
+
+## Dependencies
+
+- Requires LLVM 15.0+ for full optimization support
+- Compatible with GCC 12+ and Clang 14+
+- Windows builds now depend on Visual Studio 2022 runtime
+- Reduced external dependencies: SQLite and libxml2 are now optional components
+
+# CHANGELOG_1.2.md
+
+## [1.2.0] - 2025-03-17
+
+### Added
+
+- Added comprehensive pattern matching with support for nested destructuring, guard clauses, and exhaustiveness checking (#1842)
+- Implemented async/await syntax for more intuitive asynchronous programming. The new `async fn` declaration and `await` operator simplify complex async workflows (BRH-212)
+- Added union types to the type system, allowing more flexible type definitions while maintaining type safety. Syntax: `type Result<T> = Success<T> | Error<string>` [BRH-145]
+- Introduce new path-based module import syntax to support upcoming package manager. Thanks to Alex Johnson <alex.j@brushlang.org> for implementation
+
+### Changed
+
+- Updated string interpolation to require `${}` syntax instead of `{}` for consistency. The compiler will emit warnings for old syntax in this version (#1856)
+- Changed default memory allocator to jemalloc for improved performance. This results in 15-20% better memory utilization in benchmark tests
+- Refactored module resolution algorithm to support the new import syntax and prepare for the package manager. Old imports will trigger deprecation warnings [BRH-302]
+- String encoding was modified to use UTF-16 on Windows platforms while maintaining UTF-8 on Unix systems for better compatibility (#1901)
+
+### Fixed
+
+- Fix compiler crash when using nested lambda expressions with closure capture. The issue occurred in `eval_context()` when scope resolution failed for shadowed variables (fixes #1847)
+- Resolved race condition in async scheduler causing deadlocks when tasks were cancelled during execution. Error was occurring at brush.runtime.scheduler:372
+- Fixed memory leak in the garbage collector during cyclic reference collection. Objects with finalizers were not properly marked in `gc_collect()`. Reported by Emma Rodriguez <e.rodriguez@techcorp.io>
+- Fix parser error when using generics with more than 5 type parameters. The issue was in `parseTypeParameters()` which had a hardcoded limit (E0308)
+- Patched SEGFAULT_0x7f in the runtime when loading dynamic libraries with incompatible ABI versions. Now provides a clear error message instead of crashing
+- Updated error message for uninitialized variable access to include variable name and declaration location. Reported by Michael Chen
+
+### Performance
+
+- Improved compilation speed by 28% through parallel parsing and more efficient type checking algorithms [BRH-290]
+- Optimized string operations resulting in 42% faster string manipulation for common use cases like concatenation and substring extraction
+- Performance improvement in garbage collector, reducing pause times by 65% through incremental collection and generational heap management
+- Reduced memory usage in the compiler's symbol table by implementing a more compact representation, decreasing overall memory footprint by 35% during compilation. Thanks to Sarah Chen <s.chen@brushlang.org>
+
+### Security
+
+- Fixed potential buffer overflow in `parseExternalLibrary()` when loading libraries with extremely long path names (CVE-2025-1234)
+- Addressed integer overflow vulnerability in the binary deserialization module that could lead to arbitrary code execution (fixes #1872)
+
+### Deprecated
+
+- The legacy error handling via `try/catch` blocks is deprecated in favor of `Result<T, E>` pattern. Will be removed in 1.3
+- Deprecated dot-notation for imports (`import std.collections`) in favor of path-based syntax (`import std/collections`)
+- The `--compat-1.0` compiler flag is now deprecated and will be removed in version 1.3

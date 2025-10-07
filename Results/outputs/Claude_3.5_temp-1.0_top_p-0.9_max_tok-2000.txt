@@ -1,0 +1,153 @@
+# VERSION_1.2.md
+
+# Brush Language - Version 1.2.0 Release Notes
+
+Released: April 12, 2024
+
+## Overview
+
+Brush 1.2.0 represents a significant milestone in the language's evolution, focusing on performance optimizations, developer ergonomics, and ecosystem stability. This release includes substantial improvements to the type system, memory management, and compiler infrastructure, while maintaining compatibility with existing Brush 1.1.x codebases.
+
+We're excited to introduce the new asynchronous programming model, which enables developers to write cleaner, more maintainable concurrent code without sacrificing performance. Additionally, version 1.2.0 addresses over 40 bugs reported by the community since the 1.1.0 release.
+
+## Highlights
+
+### Asynchronous Programming Model
+
+Brush 1.2.0 introduces a comprehensive async/await syntax for handling asynchronous operations. The runtime now includes a task scheduler that efficiently manages concurrent operations using a work-stealing algorithm. This enables developers to write sequential-looking code that executes asynchronously under the hood.
+
+```brush
+async fn fetchData(url: String) -> Result<Data, Error> {
+    let response = await httpClient.get(url);
+    return response.parse();
+}
+```
+
+### Enhanced Type Inference
+
+The type inference system has been completely redesigned to support more complex scenarios. The compiler can now infer generic types across function boundaries and through higher-order functions. This reduces the need for explicit type annotations by approximately 30% in typical codebases.
+
+```brush
+// Before: Required explicit type annotations
+let map = new Map<String, List<Integer>>();
+
+// Now: Types are inferred automatically
+let map = new Map(); // Compiler infers Map<K, V> and resolves types as used
+```
+
+### Pattern Matching Enhancements
+
+Pattern matching now supports destructuring in more contexts, including function parameters, let bindings, and match expressions. The compiler optimizes pattern matching to generate efficient jump tables when appropriate, resulting in up to 40% faster matching operations for large enum types.
+
+### Memory Management Improvements
+
+The garbage collector has been rewritten with a generational approach that reduces pause times by 65% on average. Long-running applications will see the most significant benefits, with 99th percentile pause times under 5ms for heaps up to 1GB.
+
+### Standard Library Expansion
+
+The standard library has been expanded with over 30 new functions and 5 new modules:
+- `brush.async` - Utilities for asynchronous programming
+- `brush.collections.immutable` - Immutable data structures
+- `brush.net` - Networking primitives
+- `brush.fs.watch` - File system monitoring
+- `brush.debug` - Runtime debugging tools
+
+## Breaking Changes
+
+⚠️ **Module Resolution Change**: The module resolution algorithm now prioritizes local modules over global ones. Code that relied on global modules shadowing local ones will need to be updated.
+
+⚠️ **Operator Precedence Adjustment**: The precedence of the pipe operator (`|>`) has been modified to be consistent with other functional languages. This may change the behavior of complex expressions that mix pipes with other operators.
+
+```brush
+// Old behavior:
+result = a + b |> func() |> display()  // Evaluated as: ((a + b) |> func()) |> display()
+
+// New behavior:
+result = a + b |> func() |> display()  // Evaluated as: a + (b |> func() |> display())
+```
+
+## Bug Fixes
+
+Version 1.2.0 addresses 42 bugs reported since the 1.1.0 release, including critical fixes for memory leaks, compiler crashes, and type system inconsistencies. Notable improvements include resolution of the long-standing issue with recursive type inference (BRH-185) and fixing the stack overflow when using deeply nested pattern matching (BRH-203).
+
+For a complete list of fixes, see CHANGELOG_1.2.md.
+
+## Performance Improvements
+
+- **Compiler**: 25% faster compilation times for large projects through improved incremental compilation
+- **Runtime**: Memory usage reduced by 18% through optimized object representation
+- **Standard Library**: String operations are now 30-40% faster due to improved implementation
+- **Binary Size**: Executable size reduced by 12% through better dead code elimination
+
+## Deprecation Notices
+
+The following features are deprecated in 1.2.0 and will be removed in 2.0.0:
+
+- The `brush.util.legacy` module is now deprecated. Use the equivalent functions in `brush.core` instead.
+- Old-style callback patterns are deprecated in favor of the new async/await syntax.
+- The `@unsafe` annotation without explicit scope is deprecated. Use `@unsafe(scope = "function")` instead.
+
+## Installation & Upgrade
+
+Brush 1.2.0 is compatible with modules compiled for Brush 1.1.x. However, code using features affected by breaking changes may need adjustments.
+
+To upgrade:
+1. Install Brush 1.2.0 using your package manager: `brew install brush@1.2` or `apt install brush-lang=1.2.0`
+2. Run the compatibility checker on your codebase: `brush compat --check`
+3. Review any warnings and apply the suggested changes
+
+Developers upgrading from 1.1.x should review the migration guide at docs/migration/1.1-to-1.2.md for detailed instructions on handling breaking changes.
+
+## Dependencies
+
+- Requires LLVM 15.0+ (up from 14.0)
+- Compatible with GCC 11+ and Clang 13+
+- Runtime footprint reduced from 8.2MB to 6.7MB
+- Minimal system requirements remain unchanged: 2GB RAM, 100MB disk space
+
+## Community Contributions
+
+This release includes contributions from 27 community members, with special thanks to the following individuals for their significant contributions:
+- Emma Rodriguez (@erodriguez) - Async/await implementation
+- Sanjay Patel (@spatel) - Garbage collector optimizations
+- Maria Gonzalez (@mgonzalez) - Standard library enhancements
+
+We appreciate all the feedback, bug reports, and pull requests that have made Brush 1.2.0 our most stable and feature-rich release to date.
+
+# CHANGELOG_1.2.md
+
+## [1.2.0] - 2024-04-12
+
+### Added
+
+- Added new async/await syntax for handling asynchronous operations. The implementation includes a work-stealing scheduler and cooperative yielding. (BRH-156)
+
+- Implemented pattern matching for function parameters with destructuring support. Pattern matching now generates optimized jump tables for enums with many variants. (#1840)
+
+- Add new `brush.net` module with HTTP client and server implementations. The module supports both synchronous and asynchronous operation modes. Thanks to Maria Gonzalez <mgonzalez@brushlang.org>
+
+- Added immutable collections in `brush.collections.immutable` namespace, including Map, Set, List and Vector implementations with structural sharing for efficient updates. [BRH-212]
+
+### Changed
+
+- Changed module resolution algorithm to prioritize local modules over global ones. This may affect code that relies on global modules shadowing local ones. (#1862)
+
+- Update operator precedence for the pipe operator (`|>`) to be consistent with other functional languages. This is a breaking change for code that mixes pipe operators with other operators. (BRH-190)
+
+- Improve error messages for type inference failures. Error messages now include more context and suggested fixes for common issues. Thanks to Lee Wong for suggesting this improvement.
+
+### Fixed
+
+- Fixed critical memory leak in the garbage collector when circular references spanned multiple generations. The issue would manifest as growing memory usage over time in long-running applications. [BRH-187]
+
+- Fix compiler crash when using nested lambda expressions with closure capture. The issue occurred in `eval_context()` when scope resolution failed for shadowed variables (fixes #1847).
+
+- Fixed stack overflow in pattern matching when using deeply nested patterns. The compiler now uses tail recursion optimization for pattern matching evaluation. (BRH-203)
+
+- Resolved SEGFAULT in garbage collector during concurrent object allocation. Reported by Emma Rodriguez <e.rodriguez@techcorp.io>
+
+- Fix type inference for recursive generic types which previously caused E0308 errors in certain edge cases. This resolves the long-standing issue with mutually recursive type definitions. (#1901)
+
+- Fixed incorrect line numbers in error messages when source files contained tabs. Error positions are now correctly calculated regardless of whitespace type. Reported by Chris Johnson <cjohnson@mail.edu>
+
+- Fix lexer error when Unicode characters appeared in string literals at specific buffer

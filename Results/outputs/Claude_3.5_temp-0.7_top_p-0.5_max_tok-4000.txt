@@ -1,0 +1,163 @@
+# VERSION_1.2.md
+
+# Brush Language - Version 1.2.0 Release Notes
+
+Released: March 22, 2025
+
+## Overview
+
+Brush 1.2.0 represents a significant milestone in the language's evolution, focusing on performance optimization, developer ergonomics, and ecosystem stability. This release introduces several key enhancements to the type system, memory management, and concurrency model while maintaining backward compatibility with 1.1.x modules.
+
+We're excited to introduce the new asynchronous programming model, which dramatically simplifies handling of concurrent operations without sacrificing the performance characteristics that Brush developers expect. Additionally, this release includes substantial improvements to the compiler's error reporting system, making debugging more intuitive and efficient.
+
+## Highlights
+
+### New Asynchronous Programming Model
+
+Version 1.2 introduces a comprehensive async/await syntax for handling asynchronous operations with minimal boilerplate. The runtime now manages an efficient task scheduler that automatically balances work across available threads. This implementation leverages zero-cost abstractions that compile down to state machine code similar to native threads.
+
+```brush
+async fn fetch_data(url: String) -> Result<Data, NetworkError> {
+    let connection = await Network.connect(url)?;
+    let response = await connection.get()?;
+    return Data.parse(response);
+}
+```
+
+### Enhanced Type Inference System
+
+The type inference engine has been completely rewritten to provide more accurate and helpful type resolution. The compiler now performs bidirectional type checking during constraint resolution, allowing it to infer complex generic types from context without explicit annotations. This improvement reduces boilerplate by up to 40% in code heavily utilizing functional patterns and generics.
+
+### Immutable Data Structures Library
+
+Brush 1.2 ships with a comprehensive standard library for persistent immutable data structures including Vector, Map, Set, and Queue. These structures provide O(log n) performance characteristics for most operations while ensuring thread safety and eliminating an entire class of concurrency bugs. The implementation uses structural sharing to minimize memory overhead.
+
+### Improved Error Messages
+
+Compiler error messages have been redesigned to provide more context, suggested fixes, and relevant documentation links. Error spans now precisely highlight the problematic code region with multi-line visualization and color coding. The compiler can now detect common mistakes and suggest corrections with examples.
+
+```
+Error E0308: Type mismatch at line 42, column 15
+  │
+42│   let x: i32 = "hello";
+  │               ^^^^^^^ expected integer, found string
+  │
+  = Try: let x: i32 = "hello".parse()?;
+  = Learn more: https://docs.brushlang.org/errors/E0308
+```
+
+### Memory Profiler Integration
+
+The Brush toolchain now includes an integrated memory profiler that can identify allocation patterns, detect leaks, and visualize memory usage over time. The profiler adds minimal runtime overhead (less than 3%) and can be enabled in production environments. Results can be exported to standard formats compatible with external visualization tools.
+
+## Breaking Changes
+
+⚠️ **String Encoding Change**: The default string encoding has changed from UTF-8 to UTF-16 for better Windows compatibility and consistent Unicode handling. Existing code that relies on byte-level string operations may need adjustment. See migration guide in docs/migration/1.1-to-1.2.md.
+
+⚠️ **Module Resolution**: The module resolution algorithm now prioritizes local dependencies over global ones. Projects that relied on implicit global module imports must now explicitly import them or declare them in the project manifest.
+
+## Bug Fixes
+
+Version 1.2 addresses 37 reported bugs, including several critical issues in the garbage collector, parser, and type system. Notable fixes include resolving memory leaks in cyclic references, eliminating parser ambiguities with lambda expressions, and correcting type inference for higher-ranked types. For a complete list of fixes, see CHANGELOG_1.2.md.
+
+## Performance Improvements
+
+- Compiler throughput increased by 28% for large projects through parallel module compilation
+- Runtime memory usage reduced by 35% through improved object representation and garbage collection
+- String operations are now 45% faster due to optimized UTF-16 handling and SIMD acceleration
+- Startup time decreased by 60% (from 250ms to 100ms) through lazy standard library initialization
+
+## Deprecation Notices
+
+The following features are deprecated in 1.2.0 and will be removed in version 1.3:
+
+- The `callback()` function for asynchronous operations is superseded by the new async/await syntax
+- Legacy `format()` string interpolation is replaced by the more efficient template string syntax
+- The `unsafe_cast<T>()` function is deprecated in favor of the safer `try_cast<T>()` which returns a Result
+
+## Installation & Upgrade
+
+Brush 1.2.0 can be installed using the standard package manager:
+
+```
+brush-pkg install brush@1.2.0
+```
+
+Developers upgrading from 1.1.x should note the breaking changes mentioned above. Most codebases will continue to work without modification, but we recommend running the included compatibility checker:
+
+```
+brush-compat check --source=./my-project --target=1.2.0
+```
+
+## Dependencies
+
+- Requires LLVM 16.0+ for backend code generation
+- Compatible with GCC 12+ and Clang 15+
+- Runtime footprint reduced from 8.4MB to 5.2MB
+- Brush 1.2 is compatible with 1.1.x modules but may require recompilation for optimal performance
+
+## Community Contributions
+
+This release includes contributions from 42 community members. Special thanks to the type system team led by Sarah Chen and the async runtime implementation by the concurrency working group. See CONTRIBUTORS.md for a complete list of contributors to this release.
+
+# CHANGELOG_1.2.md
+
+## [1.2.0] - 2025-03-22
+
+### Added
+
+- Added async/await syntax for asynchronous programming. The new model replaces callback-based APIs with a more intuitive syntax while maintaining performance. (#1842)
+
+- Implemented immutable data structures library (Vector, Map, Set, Queue) in the standard library. These provide thread-safe alternatives to mutable collections with O(log n) performance characteristics. [BRH-245]
+
+- Add new memory profiler integration with the Brush toolchain. Profiler can identify allocation patterns and detect memory leaks with minimal overhead. Thanks to Mike Torres for the implementation.
+
+- Introduced `try_cast<T>()` as a type-safe alternative to `unsafe_cast<T>()`. The new function returns a Result type rather than potentially causing undefined behavior. (fixes #1901)
+
+### Changed
+
+- ⚠️ Changed default string encoding from UTF-8 to UTF-16 for better Windows compatibility. This may affect code that performs byte-level operations on strings. See migration guide. [BRH-302]
+
+- Updated module resolution algorithm to prioritize local dependencies over global ones. Projects relying on implicit global imports will need to explicitly import them. (#1876)
+
+- Improve error messages with contextual hints and documentation links. Error spans now precisely highlight problematic code regions with multi-line visualization. Reported by Emma Rodriguez <e.rodriguez@techcorp.io>
+
+- Refactored the type inference engine to perform bidirectional type checking during constraint resolution. This allows the compiler to infer complex generic types without explicit annotations. (#1855)
+
+### Fixed
+
+- Fixed compiler crash when using nested lambda expressions with closure capture. The issue occurred in `eval_context()` when scope resolution failed for shadowed variables. (fixes #1847)
+
+- Resolved memory leak in garbage collector during cyclic reference collection. Objects with circular references were not being properly marked during the mark phase of `gc_collect()`. [BRH-318]
+
+- Fix parser ambiguity with lambda expressions followed by binary operators. The parser now correctly handles expressions like `x => x + 1 | func()` without requiring parentheses. (#1903)
+
+- Fixed SEGFAULT_0x7f in concurrent object allocation when multiple threads attempted to expand the heap simultaneously. The issue was in src/runtime/memory.br at line 342. Reported by John Smith <jsmith@email.com>
+
+- Patched type inference bug for higher-ranked types that caused incorrect error E0308 when using generic callbacks. The issue was in the unification algorithm at brush.compiler.types:521.
+
+### Performance
+
+- Improved compiler throughput by 28% for large projects through parallel module compilation. The scheduler now efficiently distributes work across available CPU cores. (#1888)
+
+- Reduced runtime memory usage by 35% through improved object representation and garbage collection heuristics. Small objects now use a more compact memory layout. [BRH-290]
+
+- String operations are now 45% faster due to optimized UTF-16 handling and SIMD acceleration where available. This particularly benefits text processing applications. Fixed by Sarah Chen <s.chen@brushlang.org>
+
+- Decreased startup time by 60% (from 250ms to 100ms) through lazy standard library initialization. Modules are now loaded on-demand rather than at program start. (#1922)
+
+### Deprecated
+
+- Deprecated the `callback()` function for asynchronous operations. Use the new async/await syntax instead. The function will be removed in version 1.3. (#1860)
+
+- Legacy `format()` string interpolation is deprecated in favor of the more efficient template string syntax. Will be removed in 1.3.0. [BRH-275]
+
+- Deprecated `unsafe_cast<T>()` function which will be removed in version 1.3. Use the new `try_cast<T>()` function which returns a Result type instead. (#1901)
+
+### Documentation
+
+- Update documentation for async/await syntax, previous examples was using deprecated callback style. (#1870)
+
+- Added comprehensive guide for memory profiler usage in docs/tools/profiler.md. Includes examples for identifying common memory issues. Fixed by Alex Wong <a.wong@brushlang.org>
+
+- Expanded type system documentation with detailed explanations of type inference, unification, and constraint solving. See docs/language/type-system.md. (#1910)

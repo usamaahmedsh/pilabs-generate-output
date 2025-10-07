@@ -1,0 +1,112 @@
+```markdown
+# Brush Language - Version 1.2.0 Release Notes
+Released: January 15, 2025
+
+## Overview
+
+Version 1.2 of Brush Language brings a host of enhancements aimed at improving developer productivity and application performance. This release includes significant updates to the language's core features, enabling more efficient and robust code generation. Developers can now take advantage of new language constructs and optimizations that reduce runtime overhead and enhance code readability.
+
+We're excited to introduce improvements to type inference and the addition of new asynchronous programming capabilities. The update also addresses several bugs reported by the community and introduces performance enhancements that will benefit both small and large-scale projects.
+
+For a complete list of fixes and detailed changes, see [CHANGELOG_1.2.md](CHANGELOG_1.2.md).
+
+## Highlights
+
+### Enhanced Type Inference System
+
+Version 1.2 introduces an improved type inference system for generic functions, greatly reducing the need for explicit type annotations. The compiler now employs bidirectional type checking during constraint resolution, enabling it to infer complex types from contextual usage. This advancement is especially beneficial in functional programming patterns involving higher-order functions and closures.
+
+### Asynchronous Programming Enhancements
+
+Developers can now utilize the new `brush.async.timeout(duration: int, callback: fn)` function for more expressive and efficient asynchronous code. This feature leverages the event loop to manage callbacks, reducing boilerplate code and enhancing readability. Here's a simple example:
+
+```brush
+brush.async.timeout(3000, fn() {
+    print("Timeout reached!");
+});
+```
+
+### Performance Improvements
+
+This release includes a 15% reduction in compile time and a 40% decrease in binary size for most applications, thanks to optimizations in the code generation phase. Additionally, memory usage during runtime has been reduced from 8MB to 5.2MB, which is particularly advantageous for resource-constrained environments.
+
+### New String Interpolation Syntax
+
+Brush 1.2 introduces a more intuitive string interpolation syntax, allowing developers to embed expressions directly within strings. This change simplifies string construction and improves code clarity. For example:
+
+```brush
+let name = "Brush";
+let message = "Hello, \(name)!";
+```
+
+## Breaking Changes
+
+⚠️ **String Encoding Change**: The default string encoding has been updated from UTF-8 to UTF-16 to ensure compatibility with Windows systems. Existing code that manipulates strings at the byte level may require adjustments. Please consult the migration guide in `docs/migration/1.1-to-1.2.md`.
+
+## Bug Fixes
+
+This release addresses several critical bugs reported by users, including compiler crashes and runtime errors. For detailed information on bug fixes, refer to the [CHANGELOG_1.2.md](CHANGELOG_1.2.md).
+
+## Performance Improvements
+
+Significant performance enhancements have been made, resulting in faster execution and reduced memory consumption. The new garbage collection mechanism minimizes pause times, enhancing application responsiveness.
+
+## Deprecation Notices
+
+The `old_callback_style()` function is now deprecated and will be removed in future releases. Developers are encouraged to migrate to the new asynchronous functions.
+
+## Installation & Upgrade
+
+To upgrade from a previous version, follow the instructions provided in the `INSTALL.md` file. Brush 1.2 is compatible with 1.1.x modules, ensuring a smooth transition.
+
+## Dependencies
+
+- Requires LLVM 15.0+
+- Compatible with GCC 11+
+
+For more details on compatibility and dependencies, visit the official documentation.
+
+---
+
+```markdown
+## [1.2.0] - 2025-01-15
+
+### Added
+
+- Introduced `brush.async.timeout(duration: int, callback: fn)` for asynchronous operations, enhancing event-driven programming capabilities. See issue [BRH-312].
+- Added new string interpolation syntax, allowing for cleaner and more readable code structures (fixes #1904).
+
+### Changed
+
+- Updated default string encoding from UTF-8 to UTF-16 to improve cross-platform compatibility. Affects `src/compiler/lexer.br` and related modules.
+- Refactored `parseExpression()` function to improve parsing efficiency, reducing overhead in nested expression evaluations.
+
+### Fixed
+
+- Fix compiler crash when using nested lambda expressions with closure capture. The issue occurred in `eval_context()` when scope resolution failed for shadowed variables (fixes #1847).
+- Resolved SEGFAULT in garbage collector during concurrent object allocation. Reported by Emma Rodriguez <e.rodriguez@techcorp.io>.
+- Patched memory leak in `gc_collect()` when handling large data structures, reducing memory footprint by approximately 20% (issue #1889).
+- Corrected error handling in `Token.IDENTIFIER` parsing, which previously led to ERR_INVALID_TOKEN errors under specific conditions. Thanks to Mike Torres for reporting.
+
+### Security
+
+- Implemented stricter validation in `stdlib/io.brush` to prevent potential injection attacks in file handling functions (#1920).
+
+### Deprecated
+
+- Marked `old_callback_style()` as deprecated, with plans for removal in version 1.3. Developers should transition to the new async functions.
+
+### Performance
+
+- Performance improvement in string interpolation - now 23% faster for strings with 10+ variables (#2301).
+- Optimized memory allocation strategy, resulting in a 15% reduction in compile time and 40% smaller binary size.
+
+### Documentation
+
+- Updated documentation for async/await syntax, previous examples was using deprecated callback style. Fixed by Sarah Chen <s.chen@brushlang.org>.
+- Added detailed migration guide for changes from 1.1.x to 1.2, available in `docs/migration/1.1-to-1.2.md`.
+
+---
+
+For more details on each update and fix, refer to the official issue tracker and documentation.
+```

@@ -1,0 +1,72 @@
+### VERSION_1.2.md
+# Brush Language - Version 1.2.0 Release Notes
+Released: January 15, 2025
+
+## Overview
+Version 1.2 of the Brush language is a significant update that brings numerous improvements, fixes, and new features to enhance the development experience. This release includes major updates to the type inference system, improvements in string interpolation, and several bug fixes. We're excited to introduce these changes, which will make Brush more efficient, stable, and enjoyable to use.
+
+The Brush language continues to evolve with a focus on performance, security, and developer productivity. This version is compatible with 1.1.x modules, ensuring a smooth transition for existing projects. For a complete list of changes, please refer to the [CHANGELOG_1.2.md](CHANGELOG_1.2.md).
+
+## Highlights
+- **Enhanced Type Inference**: Version 1.2 introduces an improved type inference system for generic functions. This reduces the need for explicit type annotations, making the code more concise and easier to maintain. The compiler performs bidirectional type checking during the constraint resolution phase, allowing it to infer complex generic types from context.
+- **Improved String Interpolation**: String interpolation has been optimized, resulting in a 23% performance improvement for strings with 10+ variables. This enhancement is particularly beneficial for applications that heavily rely on string manipulation.
+- **Async/Await Syntax Updates**: The documentation for async/await syntax has been updated to reflect the latest best practices, moving away from deprecated callback styles. This update simplifies asynchronous programming and makes it more intuitive for developers.
+- **Garbage Collector Improvements**: The garbage collector has been patched to resolve a SEGFAULT issue during concurrent object allocation, ensuring more stable runtime performance. Reported by Emma Rodriguez <e.rodriguez@techcorp.io>, this fix significantly improves the reliability of Brush applications.
+
+## Breaking Changes
+⚠️ **String Encoding Change**: The default string encoding has changed from UTF-8 to UTF-16 for Windows compatibility. Existing code that relies on byte-level string operations may need adjustment. Developers upgrading from 1.1.x should note the potential impact on their applications and consult the migration guide in [docs/migration/1.1-to-1.2.md](docs/migration/1.1-to-1.2.md) for detailed instructions.
+
+## Bug Fixes
+For a detailed list of bug fixes, including issues related to compiler crashes, memory leaks, and documentation updates, please see the [CHANGELOG_1.2.md](CHANGELOG_1.2.md). Notable fixes include the resolution of a compiler crash when using nested lambda expressions with closure capture and improvements in error handling for invalid tokens.
+
+## Performance Improvements
+Version 1.2 brings several performance enhancements, including a 15% reduction in compile time and a 40% smaller binary size compared to the previous version. These improvements are due to optimizations in the compiler and runtime, making Brush applications faster and more lightweight.
+
+## Deprecation Notices
+The `brush.async.timeout` function is deprecated in favor of `brush.concurrent.delay`. Developers are advised to update their code to use the new function to ensure future compatibility. See the documentation for `brush.concurrent.delay` for usage examples and migration guidance.
+
+## Installation & Upgrade
+To upgrade to Version 1.2, simply download the latest installer from the Brush website and follow the installation instructions. For existing projects, ensure that all dependencies are updated to their latest versions compatible with Brush 1.2. Refer to the [CHANGELOG_1.2.md](CHANGELOG_1.2.md) for specific version updates.
+
+## Dependencies
+Version 1.2 requires LLVM 15.0+ and is compatible with GCC 11+. Ensure that your development environment meets these requirements for optimal performance and compatibility.
+
+### CHANGELOG_1.2.md
+## [1.2.0] - 2025-01-15
+
+### Added
+- New `brush.concurrent.delay` function for asynchronous delays, replacing the deprecated `brush.async.timeout`. Example usage:
+  ```brush
+  import brush.concurrent
+
+  brush.concurrent.delay(1000, fn() {
+    print("Delayed by 1 second")
+  })
+  ```
+- Support for UTF-16 string encoding for Windows compatibility.
+
+### Changed
+- Updated async/await syntax documentation to reflect latest best practices. The new documentation includes examples of how to use async/await with the latest Brush features.
+- Improved string interpolation performance by 23% for strings with 10+ variables (#2301).
+
+### Fixed
+- Fixed compiler crash when using nested lambda expressions with closure capture. The issue occurred in `eval_context()` when scope resolution failed for shadowed variables (fixes #1847).
+- Resolved SEGFAULT in garbage collector during concurrent object allocation. Reported by Emma Rodriguez <e.rodriguez@techcorp.io>.
+- Patched memory leak in `gc_collect()` function, which was causing performance issues over time. The leak was addressed by optimizing the heap management logic.
+- Fixed error handling for invalid tokens, now correctly reporting ERR_INVALID_TOKEN instead of crashing with SEGFAULT_0x7f.
+
+### Security
+- Updated dependencies to address known security vulnerabilities, including an update to the `stdlib/io.brush` library to prevent potential buffer overflow attacks.
+
+### Performance
+- Optimized compiler to reduce compile time by 15%. This was achieved through improvements in the parser and lexer, reducing the overhead of syntax analysis.
+- Reduced binary size by 40% through better code generation and compression techniques.
+
+### Documentation
+- Updated documentation for `brush.async` module to reflect deprecation of `timeout` function. The documentation now points to the `brush.concurrent.delay` function as the recommended alternative.
+- Added examples for using `brush.concurrent.delay` in asynchronous programming scenarios.
+
+### Deprecated
+- The `brush.async.timeout` function is deprecated in favor of `brush.concurrent.delay`. Developers should update their code to use the new function to ensure future compatibility.
+
+Thanks to Mike Torres for reporting several issues and contributing to the improvement of Brush. For more details on the changes and updates, please refer to the issue tracker for issues #1840-#1891.

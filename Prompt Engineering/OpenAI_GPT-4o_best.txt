@@ -1,0 +1,110 @@
+```markdown
+# Brush Language - Version 1.2.0 Release Notes
+Released: January 15, 2025
+
+## Overview
+
+Brush Language version 1.2.0 introduces a suite of new features, optimizations, and bug fixes that enhance both the developer experience and runtime performance. This release focuses on improving the language's expressive power and efficiency, making it easier to write robust and high-performance applications. We've also made significant strides in broadening the scope of Brush's compatibility with modern tooling and libraries.
+
+Version 1.2 brings enhancements to core language features, including improved type inference, new asynchronous programming capabilities, and optimizations in the standard library. Additionally, this release addresses several long-standing issues reported by the community, ensuring a smoother and more reliable development experience.
+
+We're excited to introduce these changes and are committed to continuing to evolve Brush Language to meet the needs of developers around the world.
+
+## Highlights
+
+### Improved Type Inference System
+
+Version 1.2 introduces enhanced type inference for generic functions, significantly reducing the need for explicit type annotations. The compiler now performs bidirectional type checking during the constraint resolution phase, allowing it to infer complex generic types from context. This improvement is particularly noticeable in functional programming patterns involving higher-order functions and closures.
+
+### Asynchronous Programming Enhancements
+
+Developers can now utilize the new `brush.async.timeout(duration: int, callback: fn)` function to handle asynchronous operations more efficiently. By leveraging native coroutine support, the language allows for non-blocking execution without the need for external libraries. Here's an example of its usage:
+
+```brush
+brush.async.timeout(1000, fn() {
+    println("This runs after 1 second");
+});
+```
+
+### Performance Optimizations in String Handling
+
+We have made substantial performance improvements in string interpolation, resulting in a 23% speed increase for strings with more than 10 variables. This was achieved by optimizing the underlying parsing and memory management in the `src/compiler/lexer.br` file.
+
+### Standard Library Updates
+
+The standard library now includes new modules for enhanced I/O operations, making it easier to work with file streams and network protocols. The `stdlib/io.brush` module has been expanded to support asynchronous file operations, improving overall I/O performance by up to 30%.
+
+## Breaking Changes
+
+⚠️ **String Encoding Change**: The default string encoding has changed from UTF-8 to UTF-16 for Windows compatibility. Existing code that relies on byte-level string operations may need adjustment. See migration guide in `docs/migration/1.1-to-1.2.md`.
+
+## Bug Fixes
+
+This release resolves numerous bugs, enhancing the stability and reliability of the language. For a complete list of fixes, see CHANGELOG_1.2.md.
+
+## Performance Improvements
+
+In addition to specific optimizations mentioned above, overall compile time has been reduced by 15%, and the runtime footprint has decreased from 8MB to 5.2MB. These improvements are a result of targeted optimizations in the garbage collector and parser subsystems.
+
+## Deprecation Notices
+
+Several features are marked for deprecation and will be removed in future versions. Developers should migrate away from using deprecated callback styles in favor of the new async/await syntax.
+
+## Installation & Upgrade
+
+To upgrade to Brush 1.2, existing installations can be updated via the package manager. Developers upgrading from 1.1.x should note the string encoding changes and review the migration guide for detailed instructions.
+
+## Dependencies
+
+Brush 1.2 requires LLVM 15.0+ and is compatible with GCC 11+. Make sure your development environment meets these requirements to take full advantage of the new features.
+
+---
+
+# CHANGELOG_1.2.md
+
+## [1.2.0] - 2025-01-15
+
+### Added
+
+- Introduced new asynchronous timeout function `brush.async.timeout(duration: int, callback: fn)` to enhance non-blocking execution capabilities. (see #1842)
+
+- Added support for UTF-16 string encoding to improve cross-platform compatibility, particularly on Windows systems. (fixes #1888)
+
+### Changed
+
+- Updated standard library module `stdlib/io.brush` to support asynchronous file operations, enhancing I/O performance by 30%. (reported by John Smith <jsmith@email.com>)
+
+- Change default behavior of `parseExpression()` to prevent erroneous parsing of nested expressions. This ensures more accurate abstract syntax tree (AST) generation. (BRH-302)
+
+### Fixed
+
+- Fix stack overflow when evaluating deeply nested recursive functions in `brush.runtime.eval:142`. The recursion depth was previously unchecked, leading to SEGFAULT_0x7f. (reported by Sarah Chen <s.chen@brushlang.org>)
+
+- Resolve E0308 type mismatch error in type inference for generic functions. The compiler now better infers types in complex patterns involving closures. (fixes #203)
+
+- Patched memory leak in garbage collector during concurrent object allocation. The issue was identified in the `gc_collect()` function. (thanks to Mike Torres for reporting)
+
+### Security
+
+- Patched security vulnerability in lexer that could allow arbitrary code execution via crafted input. The parser now correctly handles unexpected token sequences. (fixes #1876)
+
+### Deprecated
+
+- Deprecated old callback-style asynchronous functions in favor of async/await syntax. Developers are encouraged to migrate to the new model.
+
+### Performance
+
+- Performance improvement in string interpolation, now 23% faster for strings with 10+ variables. This was achieved by optimizing memory allocation paths. (#2301)
+
+- Reduced runtime footprint from 8MB to 5.2MB by optimizing the memory usage in core runtime libraries.
+
+### Documentation
+
+- Updated documentation for `async/await` syntax, previous examples was using deprecated callback style. Now includes examples of new usage patterns.
+
+- Documented new UTF-16 string encoding and provided migration guide for affected codebases. This was added in `docs/migration/1.1-to-1.2.md`.
+
+---
+
+For additional details on the changes made in this version, please refer to the issue tracker covering issues #1840-#1950.
+```
